@@ -718,19 +718,26 @@ def sorted_images_by_time_asce():
 
 @app.route('/images/sortByTag')
 def sorted_images_by_tag():
+    user_email = current_user.Email
     tag = request.args.get('tag', default='')
-    if tag == 'Original':
-        images = Image.query.filter(Image.Tag == 'Original').all()
-    elif tag == 'Manipulation':
-        images = Image.query.filter(Image.Tag == 'Manipulation').all()
-    elif tag == 'AIGC':
-        images = Image.query.filter(Image.Tag == 'AIGC').all()
-    else:
-        images = Image.query.all()
 
-    image_info = [{'id': image.id, 'filename': image.filename} for image in images]
+    # Filter logic:
+    # 1. If the image is public, it is always included.
+    # 2. If the image is private, it is only included if the user's email matches the image's owner.
+    query = Image.query.filter(
+        (Image.visibility == 'public') | (Image.user_email == user_email)
+    )
+
+    # Apply tag filter if provided
+    if tag:
+        query = query.filter(Image.Tag == tag)
+
+    images = query.all()
+    image_info = [{'id': image.id, 'filename': image.filename, 'description': image.description} for image in images]
+
+    # Shuffle the images to return them in random order
     random.shuffle(image_info)
-    print(image_info)
+
     return jsonify(image_info)
 
 
