@@ -299,7 +299,7 @@
 
 **Description**: Fetch image metadata.
 
-**Request Type**: URL Parameter
+**Request Type**: Path Parameter
 
 **Response**:
 
@@ -372,7 +372,7 @@ GET http://example.com/getimagedetail/42
 
 **Description**: Retrieve images sorted by upload time in descending order.
 
-**Request Type**: URL Parameters
+**Request Type**: Query Parameter
 
 **Request Params**:
 
@@ -399,7 +399,7 @@ GET http://example.com/images/sortByTimeDesc?tag=Nature
 
 **Description**: Retrieve images sorted by upload time in ascending order.
 
-**Request Type**: URL Parameters
+**Request Type**: Query Parameter
 
 **Request Params**:
 
@@ -426,7 +426,7 @@ GET http://example.com/images/sortByTimeAsce?tag=Portrait
 
 **Description**: Retrieve images filtered by a specific tag. If no tag is provided, all images are returned in random order.
 
-**Request Type**: URL Parameters
+**Request Type**: Query Parameter
 
 **Request Params**:
 
