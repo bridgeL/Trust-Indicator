@@ -158,6 +158,80 @@
 
 ---
 
+### **`POST /send-code`**
+
+**Description**: Send a verification code to a user's email.
+
+**Request Type**: JSON
+
+**Request Params**:
+
+| Name  | Type   | Description |
+| ----- | ------ | ----------- |
+| email | string | The email address to send the verification code. |
+
+**Example Request**:
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+**Response**:
+
+| Name   | Type   | Description |
+| ------ | ------ | ----------- |
+| message | string | Status of the request. |
+| token  | string | Encoded JWT token containing the verification code. |
+
+**Example Response**:
+```json
+{
+  "message": "Verification code sent.",
+  "token": "eyJhbGciOiJIUzI1..."
+}
+```
+
+---
+
+### **`POST /verify-code`**
+
+**Description**: Verify the email verification code.
+
+**Request Type**: JSON
+
+**Request Params**:
+
+| Name  | Type   | Description |
+| ----- | ------ | ----------- |
+| token | string | The JWT token received from `/send-code`. |
+| code  | string | The 4-digit verification code. |
+
+**Example Request**:
+```json
+{
+  "token": "eyJhbGciOiJIUzI1...",
+  "code": "1234"
+}
+```
+
+**Response**:
+
+| Name   | Type   | Description |
+| ------ | ------ | ----------- |
+| message | string | Verification status message. |
+| status  | string | `"success"` or `"error"`. |
+
+**Example Response**:
+```json
+{
+  "message": "Verification successful.",
+  "status": "success"
+}
+```
+
+---
+
 ## **User Profile Management**
 
 
@@ -172,6 +246,40 @@
 | id       | int    |
 | filename | string |
 
+**Example Response**:
+```json
+[
+  { "id": 1, "filename": "image1.jpg" },
+  { "id": 2, "filename": "image2.png" }
+]
+```
+
+### **`POST /change_profile_photo`**
+
+**Description**: Change the profile photo of the current user.
+
+**Request Type**: Form Data (requires authentication)
+
+**Request Params**:
+
+| Name              | Type  | Description |
+| ---------------- | ----- | ----------- |
+| selected_image  | int   | The ID of the profile photo (1-16). |
+
+**Example Request**:
+```sh
+POST http://example.com/change_profile_photo
+```
+
+**Example Response**:
+```json
+{
+  "status": "success",
+  "message": "Profile photo updated successfully."
+}
+```
+
+---
 
 ### **`GET /get_current_user`**
 
@@ -366,6 +474,81 @@ GET http://example.com/getimagedetail/42
 
 ---
 
+### **`POST /uploadImage`**
+
+**Description**: Upload an image file.
+
+**Request Type**: Form Data (requires authentication)
+
+**Request Params**:
+
+| Name  | Type  | Description |
+| ----- | ----- | ----------- |
+| file  | file  | The image file to be uploaded (JPEG format). |
+
+**Example Request**:
+```sh
+POST http://example.com/uploadImage
+```
+
+**Example Response**:
+```json
+{
+  "message": "Image successfully uploaded",
+  "filename": "image123.jpg",
+  "file_size": 204800,
+  "file_type": "image/jpeg",
+  "metadata": {
+    "ColorSpace": "sRGB",
+    "Created": "2024-03-19T10:00:00Z",
+    "Make": "Canon",
+    "Model": "EOS 5D Mark IV",
+    "FocalLength": 50.0,
+    "Aperture": 2.8
+  },
+  "id": 42
+}
+```
+
+---
+
+### **`GET /image/<int:image_id>`**
+
+**Description**: Retrieve an image file by its ID.
+
+**Request Type**: Path Parameter
+
+**Example Request**:
+```sh
+GET http://example.com/image/42
+```
+
+**Response**:
+- Returns the image file in **JPEG** format as an attachment.
+- If the image does not exist, returns **404 Not Found**.
+
+---
+
+### **`GET /getImage`**
+
+**Description**: Retrieve an image file for analysis.
+
+**Response**:
+- If an image ID exists in the session, returns the image file.
+- If no image ID exists, returns a **400 Bad Request**.
+- If the image is not found, returns **404 Not Found**.
+
+**Example Request**:
+```sh
+GET http://example.com/getImage
+```
+
+**Response**:
+- Returns the image file in **JPEG** format.
+
+---
+
+
 ## **Image Sorting and Filtering**
 
 ### **`GET /images/sortByTimeDesc`**
@@ -532,3 +715,29 @@ GET http://example.com/images/sortByTag?tag=Wildlife
   "message": "Favorite removed successfully."
 }
 ```
+
+### **`GET /getAllFavouritesByUser`**
+
+**Description**: Retrieve all favorite images of the currently logged-in user.
+
+**Response**:
+
+| Name     | Type   | Description |
+| -------- | ------ | ----------- |
+| id       | int    | Favorite record ID. |
+| filename | string | Image filename. |
+
+**Example Request**:
+```sh
+GET http://example.com/getAllFavouritesByUser
+```
+
+**Example Response**:
+```json
+[
+  { "id": 1, "filename": "image1.jpg" },
+  { "id": 2, "filename": "image2.png" }
+]
+```
+
+---
