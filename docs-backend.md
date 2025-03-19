@@ -131,6 +131,7 @@
 | ImageTitle       | string   |
 | ImageDescription | string   |
 | UploadDate       | datetime |
+| ai_prob          | float    |
 | Tag              | string   |
 | ColorSpace       | string   |
 | Created          | string   |
