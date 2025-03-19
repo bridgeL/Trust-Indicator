@@ -1,89 +1,360 @@
-## 1. Overview
+# API Documentation
 
-This API is part of a Flask-based web application that handles **user authentication**, **image uploads**, **image processing**, and **user interactions** such as favorites and feedback.
-## 2. Page Navigation and Routing
+## **User Authentication**
 
-These endpoints **solely** render pages without performing backend operations: 
-- `GET /` → Index Page
-- `GET /signup` → Signup Page 
-- `GET /upload` → Upload Page
-- `GET /login` → Login Page
-- `GET /userprofile` → User Profile Page (Requires login)
-- `GET /whatwedo` → What We Do Page
-- `GET /changepassword` → Change Password Page
-- `GET /analysis` → Analysis Page
-- `GET /logout` → Logout and redirect to Index Page
-- `GET /imagedetail` → Image Detail Page
-- `GET /feedback` → Feedback Page
-- `GET /gallery` → Gallery Page
-- `GET /getImage` → Get the image id from the user session
-- `GET /images/sortBy< TimeDesc | TimeAsc | Tag >` → sort by different methods: times and tags.
-- `GET /image/<int:image_id>` → get images by image id.
-- `GET /getcurrentuserimages` → get images belongs to a user (uid is email), queried from database.
-
-## 3. User Authentication & User Operations
-This app uses email and password to authenticate.
-The default email **`trustindicator@gmail.com`** and password **`vfiz hsgw ctke tdeu`**
-- `POST /register` → Registers a new user. 
-	- Response: "Email already exists.
-- `POST /login_function` → Authenticate a user. 
-	- Response: Invalid username or password
-- `GET /logout` → Logs out the user and clears session.
-    - Response: Redirects to the index page.
-
-- `POST /change_profile_photo` → Changes the user's profile photo.
-    - Response fail: "No image selected."
-- `GET /get_current_user` → Retrieves current user details.
-    - Response: JSON object with user details.
-## 4. Image Management
-To handle the image operations, the program uses Jsonify technique. 
-- `POST /uploadImage` → Uploads an image.
-    - Response: "Allowed file types are: png, jpg, jpeg, gif"
-- `GET /getimagedetail/<int:image_id>` → Retrieves details for a specific image.
-    - Response: JSON object with image details, or 
-- `GET /getcurrentuserimages` → Retrieves images uploaded by the logged-in user.
-
-## 5. Favorites and Feedback
-Favorites and feedback involves database. 
-- `POST /submit_feedback` → Submits user feedback.
-    - Response fail: "Error, please try again."
+### **`POST /register`**
 
 
-- `POST /register` → Regist a user, format:
-    ```json
-    {
-        "UserName": "john_doe",
-        "Email": "johndoe@example.com",
-        "LegalName": "John Doe",
-        "Password": "SecurePass123"
-    }
-    ```
-- `POST /reset-password` → Reset password for user, need email and newPassword (why need that?).
-- `POST /change-password` → Reset password for user, need email, oldPassword and newPassword.
+**Description**: Register a new user.
 
-- `POST /send-code` → Send verification code to email. 
-- `POST /verify-code` → Verrify user code. The JSON request format should contain: token: The JWT token provided to the user; code: The user-entered verification code.
-    ```json
-    {
-        "token": "xxx",
-        "code": "123456"
-    }
-    ```
-# ^^ the backend program seems to registering the user by code sending and verification, but not tested.
+**Request Type**: JSON
 
-- `POST /addToFavourite` → Adds an image to the user's favorites.
-    - Response fail: "Please login to add favourite."
-- `POST /checkFavourite` → Checks if an image is in the user's favorites.
-    - Response: JSON object with favorite status.
-- `POST /deleteFavourite` → Removes an image from the user's favorites.
-    - Response success: "Favorite removed successfully"
-- `POST /updateImageType` → Update the "type" of an image defined by imageId and imageType.
+**Request Params**:
 
-## 6. Error Code
+| Name      | Type   |
+| --------- | ------ |
+| UserName  | string |
+| Email     | string |
+| LegalName | string |
+| Password  | string |
 
-| Status Code | Meaning               |
-| ----------- | --------------------- |
-| 400         | Bad Request           |
-| 401         | Unauthorized          |
-| 404         | Not Found             |
-| 500         | Internal Server Error |
+
+**Response**:
+
+| Name    | Type   |
+| ------- | ------ |
+| message | string |
+
+
+### **`POST /login_function`**
+
+
+**Description**: Login a user.
+
+**Request Type**: JSON
+
+**Request Params**:
+
+| Name     | Type   |
+| -------- | ------ |
+| username | string |
+| password | string |
+
+
+**Response**:
+
+| Name    | Type   |
+| ------- | ------ |
+| message | string |
+
+
+### **`POST /change-password`**
+
+
+**Description**: Change user password.
+
+**Request Type**: JSON
+
+**Request Params**:
+
+| Name                 | Type   |
+| -------------------- | ------ |
+| email                | string |
+| old-password         | string |
+| new-password         | string |
+| confirm-new-password | string |
+
+
+**Response**:
+
+| Name    | Type   |
+| ------- | ------ |
+| status  | string |
+| message | string |
+
+
+### **`POST /reset-password`**
+
+
+**Description**: Reset user password.
+
+**Request Type**: JSON
+
+**Request Params**:
+
+| Name        | Type   |
+| ----------- | ------ |
+| email       | string |
+| newPassword | string |
+
+
+**Response**:
+
+| Name    | Type   |
+| ------- | ------ |
+| status  | string |
+| message | string |
+
+
+### **`GET /logout`**
+
+
+**Description**: Logout user and redirect to home page.
+
+**Response**: Redirect to `/`
+
+## **Image Management**
+
+### **`POST /uploadImage`**
+
+
+**Description**: Upload an image.
+
+**Request Type**: Multipart Form Data
+
+**Request Params**:
+
+| Name | Type |
+| ---- | ---- |
+| file | File |
+
+
+**Response**:
+
+| Name      | Type   |
+| --------- | ------ |
+| message   | string |
+| filename  | string |
+| file_size | int    |
+| file_type | string |
+| metadata  | object |
+| id        | int    |
+
+
+### **`GET /getimagedetail/<int:image_id>`**
+
+
+**Description**: Fetch image metadata.
+
+**Request Type**: URL Parameter
+
+**Response**:
+
+| Name             | Type     |
+| ---------------- | -------- |
+| id               | int      |
+| filename         | string   |
+| user_email       | string   |
+| ImageTitle       | string   |
+| ImageDescription | string   |
+| UploadDate       | datetime |
+| Tag              | string   |
+| ColorSpace       | string   |
+| Created          | string   |
+| Make             | string   |
+| Model            | string   |
+| FocalLength      | float    |
+| Aperture         | float    |
+| Exposure         | float    |
+| ISO              | int      |
+| Flash            | int      |
+| ImageWidth       | int      |
+| ImageLength      | int      |
+| Altitude         | float    |
+| LatitudeRef      | string   |
+| Latitude         | float    |
+| LongitudeRef     | string   |
+| Longitude        | float    |
+
+
+### **`POST /updateImageType`**
+
+
+**Description**: Update image tag type.
+
+**Request Type**: Form Data
+
+**Request Params**:
+
+| Name      | Type   |
+| --------- | ------ |
+| imageId   | int    |
+| imageType | string |
+
+
+**Response**:
+
+| Name   | Type   |
+| ------ | ------ |
+| status | string |
+
+
+### **`GET /getimages`**
+
+
+**Description**: Get all images.
+
+**Request Type**: None
+
+**Response**:
+
+| Name     | Type   |
+| -------- | ------ |
+| id       | int    |
+| filename | string |
+
+
+### **`GET /images/sortByTimeDesc`**
+
+
+**Description**: Get images sorted by time (descending).
+
+**Request Type**: URL Params
+
+**Request Params**:
+
+| Name | Type   |
+| ---- | ------ |
+| tag  | string |
+
+
+**Response**:
+
+| Name     | Type   |
+| -------- | ------ |
+| id       | int    |
+| filename | string |
+
+
+### **`GET /images/sortByTimeAsce`**
+
+
+**Description**: Get images sorted by time (ascending).
+
+**Request Type**: URL Params
+
+**Request Params**:
+
+| Name | Type   |
+| ---- | ------ |
+| tag  | string |
+
+
+**Response**:
+
+| Name     | Type   |
+| -------- | ------ |
+| id       | int    |
+| filename | string |
+
+
+### **`POST /addToFavourite`**
+
+
+**Description**: Add an image to favorites.
+
+**Request Type**: JSON
+
+**Request Params**:
+
+| Name     | Type |
+| -------- | ---- |
+| image_id | int  |
+
+
+**Response**:
+
+| Name    | Type   |
+| ------- | ------ |
+| message | string |
+
+
+### **`POST /checkFavourite`**
+
+
+**Description**: Check if an image is favorited.
+
+**Request Type**: JSON
+
+**Request Params**:
+
+| Name     | Type |
+| -------- | ---- |
+| image_id | int  |
+
+
+**Response**:
+
+| Name        | Type |
+| ----------- | ---- |
+| isFavourite | bool |
+
+
+### **`POST /deleteFavourite`**
+
+
+**Description**: Remove an image from favorites.
+
+**Request Type**: JSON
+
+**Request Params**:
+
+| Name     | Type |
+| -------- | ---- |
+| image_id | int  |
+
+
+**Response**:
+
+| Name    | Type   |
+| ------- | ------ |
+| message | string |
+
+### **`POST /api/updateImageDesc`**
+
+
+**Description**: update the description of the image
+
+**Request Type**: JSON
+
+**Request Params**:
+
+| Name     | Type   |
+| -------- | ------ |
+| image_id | int    |
+| desc     | string |
+
+
+**Response**:
+
+| Name    | Type   |
+| ------- | ------ |
+| success | bool   |
+| message | string |
+
+## **User Profile Management**
+
+### **`GET /get_current_user`**
+
+
+**Description**: Get current logged-in user.
+
+**Response**:
+
+| Name  | Type   |
+| ----- | ------ |
+| name  | string |
+| email | string |
+
+
+### **`GET /getcurrentuserimages`**
+
+
+**Description**: Get all images uploaded by the current user.
+
+**Response**:
+
+| Name     | Type   |
+| -------- | ------ |
+| id       | int    |
+| filename | string |
