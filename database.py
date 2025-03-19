@@ -1,11 +1,15 @@
 import os
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
+import sys 
 
-db = SQLAlchemy()
+# preparation to create db
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///MyDatabase.db'
+db = SQLAlchemy(app)
 
-
-class User(UserMixin, db.Model):
+class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     UserName = db.Column(db.String(80), nullable=False)
@@ -16,34 +20,6 @@ class User(UserMixin, db.Model):
     Is_Admin = db.Column(db.Boolean, default=False)
     images = db.relationship('Image', backref='user', lazy=True)
 
-
-# class Metadata(db.Model):
-#     __tablename__ = 'Metadata'
-#     ImageID = db.Column(db.Integer, primary_key=True)
-#     File_Size = db.Column(db.Integer)
-#     File_Type = db.Column(db.Text)
-#     MIME_Type = db.Column(db.Text)
-#     Create_Date = db.Column(db.Text)
-#     Modify_Date = db.Column(db.Text)
-#     Color_Space = db.Column(db.Text)
-#     Make = db.Column(db.Text)
-#     Model = db.Column(db.Text)
-#     Lens = db.Column(db.Text)
-#     Focal_Length = db.Column(db.REAL)
-#     Aperture = db.Column(db.REAL)
-#     Exposure = db.Column(db.REAL)
-#     ISO = db.Column(db.Integer)
-#     Flash = db.Column(db.Text)
-#     Altitude = db.Column(db.REAL)
-#     Latitude = db.Column(db.REAL)
-#     Longitude = db.Column(db.REAL)
-#     Software = db.Column(db.Text)
-
-# class EFMigrationsHistory(db.Model):
-#     __tablename__ = '_EFMigrationsHistory'
-#     MigrationId = db.Column(db.Text, primary_key=True)
-#     ProductVersion = db.Column(db.Text)
-#
 class Favorites(db.Model):
     __tablename__ = 'favorites'
     RecordID = db.Column(db.Integer, primary_key=True)
@@ -55,7 +31,6 @@ class Favorites(db.Model):
     Comment = db.Column(db.Text)
     Create_Date = db.Column(db.Text)
 
-
 class Feedback(db.Model):
     __tablename__ = 'feedback'
     id = db.Column(db.Integer, primary_key=True)
@@ -64,7 +39,6 @@ class Feedback(db.Model):
     date = db.Column(db.Text)
     feedback_type = db.Column(db.String(120))
     content = db.Column(db.Text)
-
 
 class Image(db.Model):
     __tablename__ = 'images'
@@ -77,6 +51,8 @@ class Image(db.Model):
     UploadDate = db.Column(db.Text)
     Tag = db.Column(db.Text)
     # Add fields for metadata
+    IsPrivate = db.Column(db.Boolean, default=False)
+
     ColorSpace = db.Column(db.Text)
     Created = db.Column(db.Text)
     Make = db.Column(db.Text)
@@ -95,10 +71,13 @@ class Image(db.Model):
     Longitude = db.Column(db.Text, nullable=True)
 
 
-def create_database(app):
-    """Create SQLite database if it doesn't exist."""
-    if not os.path.exists('instance/MyDatabase.db'):
-        with app.app_context():
-            # db.init_app(app)
-            db.create_all()
-        print("Database created!")
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == '--recreate':
+        db_path = os.path.join(app.instance_path, 'instance/MyDatabase.db')
+        if os.path.exists(db_path):
+            os.remove(db_path)
+        print("Database removed.")
+    
+    with app.app_context():
+        db.create_all()
+        print("Database created.")
