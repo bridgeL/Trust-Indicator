@@ -1,6 +1,4 @@
-torch
 flask
-torchvision
 jwt
 requests
 flask_sqlalchemy

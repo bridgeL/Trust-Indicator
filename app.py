@@ -5,12 +5,8 @@ from datetime import datetime, timedelta
 from io import BytesIO
 
 import jwt
-import torch
-from PIL import Image as PILImage
-from torchvision import transforms
 from requests import Session
-from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, send_file, session
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, url_for, jsonify, send_file, session
 from flask_session import Session
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from flask_mail import Mail, Message
