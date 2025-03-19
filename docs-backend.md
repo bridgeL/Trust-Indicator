@@ -230,7 +230,6 @@
 
 | Name    | Type   |
 | ------- | ------ |
-| user_id | int    |
 | tag     | string |
 
 **Response**:
