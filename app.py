@@ -749,6 +749,21 @@ def update_image_type():
     else:
         return jsonify({'status': 'failed'})
 
+@app.route('/api/updateImageDesc', methods=['POST'])
+@login_required
+def update_image_desc():
+    image_id = request.form['image_id']
+    new_desc = request.form['desc']
+
+    image = Image.query.get(image_id)
+
+    if image and image.user_email == current_user.Email:
+        image.ImageDescription = new_desc
+        db.session.commit()
+        return jsonify({'status': 'success'})
+    else:
+        return jsonify({'status': 'failed'})
+
 
 @app.route('/getImage')
 def get_image_for_analysis():

@@ -228,9 +228,9 @@
 
 **Request Params**:
 
-| Name    | Type   |
-| ------- | ------ |
-| tag     | string |
+| Name | Type   |
+| ---- | ------ |
+| tag  | string |
 
 **Response**:
 
@@ -309,10 +309,9 @@
 
 **Response**:
 
-| Name    | Type   |
-| ------- | ------ |
-| success | bool   |
-| message | string |
+| Name   | Type   |
+| ------ | ------ |
+| status | string |
 
 ## **User Profile Management**
 
