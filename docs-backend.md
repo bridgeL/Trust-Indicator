@@ -4,7 +4,6 @@
 
 ### **`POST /register`**
 
-
 **Description**: Register a new user.
 
 **Request Type**: JSON
@@ -18,16 +17,13 @@
 | LegalName | string |
 | Password  | string |
 
-
 **Response**:
 
 | Name    | Type   |
 | ------- | ------ |
 | message | string |
 
-
 ### **`POST /login_function`**
-
 
 **Description**: Login a user.
 
@@ -40,16 +36,13 @@
 | username | string |
 | password | string |
 
-
 **Response**:
 
 | Name    | Type   |
 | ------- | ------ |
 | message | string |
 
-
 ### **`POST /change-password`**
-
 
 **Description**: Change user password.
 
@@ -64,7 +57,6 @@
 | new-password         | string |
 | confirm-new-password | string |
 
-
 **Response**:
 
 | Name    | Type   |
@@ -72,9 +64,7 @@
 | status  | string |
 | message | string |
 
-
 ### **`POST /reset-password`**
-
 
 **Description**: Reset user password.
 
@@ -87,7 +77,6 @@
 | email       | string |
 | newPassword | string |
 
-
 **Response**:
 
 | Name    | Type   |
@@ -95,9 +84,7 @@
 | status  | string |
 | message | string |
 
-
 ### **`GET /logout`**
-
 
 **Description**: Logout user and redirect to home page.
 
@@ -106,7 +93,6 @@
 ## **Image Management**
 
 ### **`POST /uploadImage`**
-
 
 **Description**: Upload an image.
 
@@ -117,7 +103,6 @@
 | Name | Type |
 | ---- | ---- |
 | file | File |
-
 
 **Response**:
 
@@ -130,9 +115,7 @@
 | metadata  | object |
 | id        | int    |
 
-
 ### **`GET /getimagedetail/<int:image_id>`**
-
 
 **Description**: Fetch image metadata.
 
@@ -166,9 +149,7 @@
 | LongitudeRef     | string   |
 | Longitude        | float    |
 
-
 ### **`POST /updateImageType`**
-
 
 **Description**: Update image tag type.
 
@@ -181,16 +162,13 @@
 | imageId   | int    |
 | imageType | string |
 
-
 **Response**:
 
 | Name   | Type   |
 | ------ | ------ |
 | status | string |
 
-
 ### **`GET /getimages`**
-
 
 **Description**: Get all images.
 
@@ -203,9 +181,7 @@
 | id       | int    |
 | filename | string |
 
-
 ### **`GET /images/sortByTimeDesc`**
-
 
 **Description**: Get images sorted by time (descending).
 
@@ -217,7 +193,6 @@
 | ---- | ------ |
 | tag  | string |
 
-
 **Response**:
 
 | Name     | Type   |
@@ -225,9 +200,7 @@
 | id       | int    |
 | filename | string |
 
-
 ### **`GET /images/sortByTimeAsce`**
-
 
 **Description**: Get images sorted by time (ascending).
 
@@ -239,7 +212,6 @@
 | ---- | ------ |
 | tag  | string |
 
-
 **Response**:
 
 | Name     | Type   |
@@ -247,9 +219,28 @@
 | id       | int    |
 | filename | string |
 
+### **`GET /images/sortByTag`**
+
+**Description**: Retrieve images filtered by tag and user. If no tag is provided, all images owned by the user are returned in random order.
+
+**Request Type**: URL Params
+
+**Request Params**:
+
+| Name    | Type   |
+| ------- | ------ |
+| user_id | int    |
+| tag     | string |
+
+**Response**:
+
+| Name        | Type   |
+| ----------- | ------ |
+| id          | int    |
+| filename    | string |
+| description | string |
 
 ### **`POST /addToFavourite`**
-
 
 **Description**: Add an image to favorites.
 
@@ -261,16 +252,13 @@
 | -------- | ---- |
 | image_id | int  |
 
-
 **Response**:
 
 | Name    | Type   |
 | ------- | ------ |
 | message | string |
 
-
 ### **`POST /checkFavourite`**
-
 
 **Description**: Check if an image is favorited.
 
@@ -282,16 +270,13 @@
 | -------- | ---- |
 | image_id | int  |
 
-
 **Response**:
 
 | Name        | Type |
 | ----------- | ---- |
 | isFavourite | bool |
 
-
 ### **`POST /deleteFavourite`**
-
 
 **Description**: Remove an image from favorites.
 
@@ -303,7 +288,6 @@
 | -------- | ---- |
 | image_id | int  |
 
-
 **Response**:
 
 | Name    | Type   |
@@ -311,7 +295,6 @@
 | message | string |
 
 ### **`POST /api/updateImageDesc`**
-
 
 **Description**: update the description of the image
 
@@ -324,7 +307,6 @@
 | image_id | int    |
 | desc     | string |
 
-
 **Response**:
 
 | Name    | Type   |
@@ -336,7 +318,6 @@
 
 ### **`GET /get_current_user`**
 
-
 **Description**: Get current logged-in user.
 
 **Response**:
@@ -346,9 +327,7 @@
 | name  | string |
 | email | string |
 
-
 ### **`GET /getcurrentuserimages`**
-
 
 **Description**: Get all images uploaded by the current user.
 
