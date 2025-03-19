@@ -4,6 +4,7 @@
 # cache
 /flask_session_cache
 /uploads
+exif_data.txt
 
 .vs
 .idea
