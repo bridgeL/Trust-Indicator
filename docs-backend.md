@@ -338,6 +338,40 @@ POST http://example.com/change_profile_photo
 
 ---
 
+### **`POST /api/updateImageVisibility`**
+
+**Description**: Update the visibility of an image.
+
+**Request Type**: JSON
+
+**Request Params**:
+
+| Name     | Type   | Description |
+| -------- | ------ | ----------- |
+| image_id | int    | The unique identifier of the image. |
+| visibility     | string | private / public. |
+
+**Example Request**:
+```json
+{
+  "image_id": 42,
+  "visibility": "private"
+}
+```
+
+**Response**:
+
+| Name   | Type   | Description |
+| ------ | ------ | ----------- |
+| status | string | Status of the update operation. |
+
+**Example Response**:
+```json
+{
+  "status": "success"
+}
+```
+
 ### **`POST /api/updateImageDesc`**
 
 **Description**: Update the description of an image.
