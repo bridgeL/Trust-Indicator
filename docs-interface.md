@@ -20,7 +20,7 @@ fetch('/change-password', {
     })})
 ```
 
-### Url 
+### Path Parameter 
 
 ```js
 function loadImage(imageId){
@@ -35,7 +35,7 @@ function loadImage(imageId){
         function updateMetadataOnPage(metadata) {
 ```
 
-### Url Params
+### Query Parameter
 
 ```js
 img.onclick = function () {
@@ -58,7 +58,7 @@ def change_password():
     data = request.get_json()
 ```
 
-### Url 
+### Path Parameter 
 
 ```py
 @app.route('/getimagedetail/<int:image_id>')
@@ -66,7 +66,7 @@ def getImageDetail(image_id):
     ...
 ```
 
-### Url Params
+### Query Parameter
 
 ```py
 @app.route('/imagedetail')
