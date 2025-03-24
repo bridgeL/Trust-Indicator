@@ -5,12 +5,8 @@ from datetime import datetime, timedelta
 from io import BytesIO
 
 import jwt
-import torch
-from PIL import Image as PILImage
-from torchvision import transforms
 from requests import Session
-from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, send_file, session
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, url_for, jsonify, send_file, session
 from flask_session import Session
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from flask_mail import Mail, Message
@@ -744,6 +740,21 @@ def update_image_type():
     image = Image.query.get(image_id)
     if image:
         image.Tag = image_type
+        db.session.commit()
+        return jsonify({'status': 'success'})
+    else:
+        return jsonify({'status': 'failed'})
+
+@app.route('/api/updateImageDesc', methods=['POST'])
+@login_required
+def update_image_desc():
+    image_id = request.form['image_id']
+    new_desc = request.form['desc']
+
+    image = Image.query.get(image_id)
+
+    if image and image.user_email == current_user.Email:
+        image.ImageDescription = new_desc
         db.session.commit()
         return jsonify({'status': 'success'})
     else:

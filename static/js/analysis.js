@@ -100,10 +100,9 @@ document.querySelector('#percentage-Manipulation').textContent = `${score_manipu
 
 
 // signal 替换
-var firstIndicatorImages = ['5.png', '5.png', /* ... more icons ... */];
 var secondIndicatorImages = ['origin.png', 'aigc.png', /* ... more icons ... */];
 if (score_manipulation > 30) {
-    document.getElementById("signal1").style.backgroundImage = `url('/static/images/5.png')`;
+    document.getElementById("signal1").style.backgroundImage = `url('/static/images/aigc.png')`;
     document.getElementById("signal1").style.backgroundSize = 'contain';
     document.getElementById("signal1").style.backgroundRepeat = 'no-repeat';
 } else {

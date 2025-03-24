@@ -76,8 +76,8 @@ function fetchSortedImagesByType(tag) {
 
 function updateGallery(data){
     const gallery = document.querySelector('.photo-gallery');
-    var firstIndicatorImages = ['5.png', '5.png', /* ... more icons ... */];
-    var secondIndicatorImages = ['6.png', '6.png', /* ... more icons ... */];
+    var firstIndicatorImages = ['aigc.png', 'aigc.png', /* ... more icons ... */];
+    var secondIndicatorImages = ['origin.png', 'origin.png', /* ... more icons ... */];
     gallery.innerHTML = "<div class=\"photo\" style=\"display: none\">\n" +
                 "                <div class=\"photo-indicators\">\n" +
                 "                    <div class=\"indicator\"></div>\n" +
