@@ -721,7 +721,8 @@ def sorted_images_by_tag():
     # 1. If the image is public, it is always included.
     # 2. If the image is private, it is only included if the user's email matches the image's owner.
     query = Image.query.filter(
-        (Image.visibility == 'public') | (Image.user_email == user_email)
+        (Image.visibility == 'public') |
+        ((Image.visibility == 'private') & (Image.user_email == user_email))
     )
 
     # Apply tag filter if provided
@@ -729,7 +730,7 @@ def sorted_images_by_tag():
         query = query.filter(Image.Tag == tag)
 
     images = query.all()
-    image_info = [{'id': image.id, 'filename': image.filename, 'description': image.description} for image in images]
+    image_info = [{'id': image.id, 'filename': image.filename, 'description': image.ImageDescription} for image in images]
 
     # Shuffle the images to return them in random order
     random.shuffle(image_info)
