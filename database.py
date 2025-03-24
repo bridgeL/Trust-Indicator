@@ -58,8 +58,8 @@ class Image(db.Model):
     Tag = db.Column(db.Text)
     # Add fields for metadata
     # IsPrivate = db.Column(db.Boolean, default=False)
-    Visibility = db.Column(db.String(10), nullable=False, default=VisibilityEnum.PUBLIC)
-    Result = db.Column(db.Float, nullable=True)
+    visibility = db.Column(db.String(10), nullable=False, default=VisibilityEnum.PUBLIC)
+    ai_prob = db.Column(db.Float, nullable=True)
 
     ColorSpace = db.Column(db.Text)
     Created = db.Column(db.Text)
