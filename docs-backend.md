@@ -10,35 +10,18 @@
 
 **Request Params**:
 
-| Name      | Type   | Description |
-| --------- | ------ | ----------- |
-| UserName  | string | The username of the new user. |
+| Name      | Type   | Description                                |
+| --------- | ------ | ------------------------------------------ |
+| UserName  | string | The username of the new user.              |
 | Email     | string | The user's email address (must be unique). |
-| LegalName | string | The user's full legal name. |
-| Password  | string | The password for the user account. |
-
-**Example Request**:
-```json
-{
-  "UserName": "john_doe",
-  "Email": "john@example.com",
-  "LegalName": "John Doe",
-  "Password": "securepassword123"
-}
-```
+| LegalName | string | The user's full legal name.                |
+| Password  | string | The password for the user account.         |
 
 **Response**:
 
-| Name    | Type   | Description |
-| ------- | ------ | ----------- |
+| Name    | Type   | Description                                         |
+| ------- | ------ | --------------------------------------------------- |
 | message | string | Confirmation message indicating success or failure. |
-
-**Example Response**:
-```json
-{
-  "message": "User registered successfully."
-}
-```
 
 ---
 
@@ -50,31 +33,16 @@
 
 **Request Params**:
 
-| Name     | Type   | Description |
-| -------- | ------ | ----------- |
-| username | string | The username of the user. |
+| Name     | Type   | Description                                    |
+| -------- | ------ | ---------------------------------------------- |
+| username | string | The username of the user.                      |
 | password | string | The password associated with the user account. |
-
-**Example Request**:
-```json
-{
-  "username": "john_doe",
-  "password": "securepassword123"
-}
-```
 
 **Response**:
 
-| Name    | Type   | Description |
-| ------- | ------ | ----------- |
+| Name    | Type   | Description                    |
+| ------- | ------ | ------------------------------ |
 | message | string | Authentication result message. |
-
-**Example Response**:
-```json
-{
-  "message": "Login successful."
-}
-```
 
 ---
 
@@ -86,37 +54,19 @@
 
 **Request Params**:
 
-| Name                 | Type   | Description |
-| -------------------- | ------ | ----------- |
-| email                | string | The user's email address. |
-| old-password         | string | The user's current password. |
-| new-password         | string | The new password to be set. |
+| Name                 | Type   | Description                       |
+| -------------------- | ------ | --------------------------------- |
+| email                | string | The user's email address.         |
+| old-password         | string | The user's current password.      |
+| new-password         | string | The new password to be set.       |
 | confirm-new-password | string | Confirmation of the new password. |
-
-**Example Request**:
-```json
-{
-  "email": "john@example.com",
-  "old-password": "securepassword123",
-  "new-password": "newsecurepassword456",
-  "confirm-new-password": "newsecurepassword456"
-}
-```
 
 **Response**:
 
-| Name    | Type   | Description |
-| ------- | ------ | ----------- |
-| status  | string | Indicates success or failure. |
+| Name    | Type   | Description                      |
+| ------- | ------ | -------------------------------- |
+| status  | string | Indicates success or failure.    |
 | message | string | Status message of the operation. |
-
-**Example Response**:
-```json
-{
-  "status": "success",
-  "message": "Password changed successfully."
-}
-```
 
 ---
 
@@ -128,33 +78,17 @@
 
 **Request Params**:
 
-| Name        | Type   | Description |
-| ----------- | ------ | ----------- |
-| email       | string | The user's email address. |
+| Name        | Type   | Description                            |
+| ----------- | ------ | -------------------------------------- |
+| email       | string | The user's email address.              |
 | newPassword | string | The new password for the user account. |
-
-**Example Request**:
-```json
-{
-  "email": "john@example.com",
-  "newPassword": "newpassword789"
-}
-```
 
 **Response**:
 
-| Name    | Type   | Description |
-| ------- | ------ | ----------- |
-| status  | string | Indicates success or failure. |
+| Name    | Type   | Description                      |
+| ------- | ------ | -------------------------------- |
+| status  | string | Indicates success or failure.    |
 | message | string | Status message of the operation. |
-
-**Example Response**:
-```json
-{
-  "status": "success",
-  "message": "Password reset successfully."
-}
-```
 
 ---
 
@@ -166,31 +100,16 @@
 
 **Request Params**:
 
-| Name  | Type   | Description |
-| ----- | ------ | ----------- |
+| Name  | Type   | Description                                      |
+| ----- | ------ | ------------------------------------------------ |
 | email | string | The email address to send the verification code. |
-
-**Example Request**:
-```json
-{
-  "email": "user@example.com"
-}
-```
 
 **Response**:
 
-| Name   | Type   | Description |
-| ------ | ------ | ----------- |
-| message | string | Status of the request. |
-| token  | string | Encoded JWT token containing the verification code. |
-
-**Example Response**:
-```json
-{
-  "message": "Verification code sent.",
-  "token": "eyJhbGciOiJIUzI1..."
-}
-```
+| Name    | Type   | Description                                         |
+| ------- | ------ | --------------------------------------------------- |
+| message | string | Status of the request.                              |
+| token   | string | Encoded JWT token containing the verification code. |
 
 ---
 
@@ -202,38 +121,21 @@
 
 **Request Params**:
 
-| Name  | Type   | Description |
-| ----- | ------ | ----------- |
+| Name  | Type   | Description                               |
+| ----- | ------ | ----------------------------------------- |
 | token | string | The JWT token received from `/send-code`. |
-| code  | string | The 4-digit verification code. |
-
-**Example Request**:
-```json
-{
-  "token": "eyJhbGciOiJIUzI1...",
-  "code": "1234"
-}
-```
+| code  | string | The 4-digit verification code.            |
 
 **Response**:
 
-| Name   | Type   | Description |
-| ------ | ------ | ----------- |
+| Name    | Type   | Description                  |
+| ------- | ------ | ---------------------------- |
 | message | string | Verification status message. |
-| status  | string | `"success"` or `"error"`. |
-
-**Example Response**:
-```json
-{
-  "message": "Verification successful.",
-  "status": "success"
-}
-```
+| status  | string | `"success"` or `"error"`.    |
 
 ---
 
 ## **User Profile Management**
-
 
 ### **`GET /getcurrentuserimages`**
 
@@ -246,14 +148,6 @@
 | id       | int    |
 | filename | string |
 
-**Example Response**:
-```json
-[
-  { "id": 1, "filename": "image1.jpg" },
-  { "id": 2, "filename": "image2.png" }
-]
-```
-
 ### **`POST /change_profile_photo`**
 
 **Description**: Change the profile photo of the current user.
@@ -262,22 +156,9 @@
 
 **Request Params**:
 
-| Name              | Type  | Description |
-| ---------------- | ----- | ----------- |
-| selected_image  | int   | The ID of the profile photo (1-16). |
-
-**Example Request**:
-```sh
-POST http://example.com/change_profile_photo
-```
-
-**Example Response**:
-```json
-{
-  "status": "success",
-  "message": "Profile photo updated successfully."
-}
-```
+| Name           | Type | Description                         |
+| -------------- | ---- | ----------------------------------- |
+| selected_image | int  | The ID of the profile photo (1-16). |
 
 ---
 
@@ -287,18 +168,12 @@ POST http://example.com/change_profile_photo
 
 **Response**:
 
-| Name  | Type   | Description |
-| ----- | ------ | ----------- |
-| name  | string | The username of the logged-in user. |
+| Name  | Type   | Description                              |
+| ----- | ------ | ---------------------------------------- |
+| name  | string | The username of the logged-in user.      |
 | email | string | The email address of the logged-in user. |
 
-**Example Response**:
-```json
-{
-  "name": "john_doe",
-  "email": "john@example.com"
-}
-```
+---
 
 ## **Image Management**
 
@@ -310,31 +185,16 @@ POST http://example.com/change_profile_photo
 
 **Request Params**:
 
-| Name      | Type   | Description |
-| --------- | ------ | ----------- |
+| Name      | Type   | Description                         |
+| --------- | ------ | ----------------------------------- |
 | imageId   | int    | The unique identifier of the image. |
-| imageType | string | The new tag type for the image. |
-
-**Example Request**:
-```json
-{
-  "imageId": 42,
-  "imageType": "Nature"
-}
-```
+| imageType | string | The new tag type for the image.     |
 
 **Response**:
 
-| Name   | Type   | Description |
-| ------ | ------ | ----------- |
+| Name   | Type   | Description                     |
+| ------ | ------ | ------------------------------- |
 | status | string | Status of the update operation. |
-
-**Example Response**:
-```json
-{
-  "status": "success"
-}
-```
 
 ---
 
@@ -346,68 +206,39 @@ POST http://example.com/change_profile_photo
 
 **Request Params**:
 
-| Name     | Type   | Description |
-| -------- | ------ | ----------- |
-| image_id | int    | The unique identifier of the image. |
-| visibility     | string | private / public. |
-
-**Example Request**:
-```json
-{
-  "image_id": 42,
-  "visibility": "private"
-}
-```
+| Name       | Type   | Description                         |
+| ---------- | ------ | ----------------------------------- |
+| image_id   | int    | The unique identifier of the image. |
+| visibility | string | private / public.                   |
 
 **Response**:
 
-| Name   | Type   | Description |
-| ------ | ------ | ----------- |
+| Name   | Type   | Description                     |
+| ------ | ------ | ------------------------------- |
 | status | string | Status of the update operation. |
 
-**Example Response**:
-```json
-{
-  "status": "success"
-}
-```
+---
 
 ### **`POST /api/updateImageDesc`**
 
 **Description**: Update the description of an image.
 
-**Request Type**: JSON
+**Request Type**: Form Data (requires authentication)
 
 **Request Params**:
 
-| Name     | Type   | Description |
-| -------- | ------ | ----------- |
+| Name     | Type   | Description                         |
+| -------- | ------ | ----------------------------------- |
 | image_id | int    | The unique identifier of the image. |
-| desc     | string | The new description for the image. |
-
-**Example Request**:
-```json
-{
-  "image_id": 42,
-  "desc": "A beautiful sunset over the mountains."
-}
-```
+| desc     | string | The new description for the image.  |
 
 **Response**:
 
-| Name   | Type   | Description |
-| ------ | ------ | ----------- |
+| Name   | Type   | Description                     |
+| ------ | ------ | ------------------------------- |
 | status | string | Status of the update operation. |
 
-**Example Response**:
-```json
-{
-  "status": "success"
-}
-```
-
 ---
-
 
 ### **`GET /getimages`**
 
@@ -415,27 +246,12 @@ POST http://example.com/change_profile_photo
 
 **Response**:
 
-| Name     | Type   | Description |
-| -------- | ------ | ----------- |
-| id       | int    | Image ID. |
+| Name     | Type   | Description     |
+| -------- | ------ | --------------- |
+| id       | int    | Image ID.       |
 | filename | string | Image filename. |
 
-**Example Response**:
-```json
-[
-  {
-    "id": 42,
-    "filename": "image123.jpg"
-  },
-  {
-    "id": 43,
-    "filename": "image456.png"
-  }
-]
-```
-
 ---
-
 
 ### **`GET /getimagedetail/<int:image_id>`**
 
@@ -445,66 +261,32 @@ POST http://example.com/change_profile_photo
 
 **Response**:
 
-| Name             | Type     | Description |
-| ---------------- | -------- | ----------- |
-| id               | int      | Unique image identifier. |
-| filename         | string   | Image filename. |
-| user_email       | string   | Email of the user who uploaded the image. |
-| ImageTitle       | string   | Title of the image. |
-| ImageDescription | string   | Description of the image. |
-| UploadDate       | datetime | Timestamp of when the image was uploaded. |
-| ai_prob          | float    | AI detection probability score (if applicable). |
-| Tag              | string   | Image category or tag. |
-| ColorSpace       | string   | Color space of the image. |
-| Created          | string   | Date and time when the image was created. |
-| Make             | string   | Camera manufacturer. |
-| Model            | string   | Camera model. |
-| FocalLength      | float    | Focal length used in the image. |
-| Aperture         | float    | Aperture setting of the image. |
-| Exposure         | float    | Exposure setting of the image. |
-| ISO              | int      | ISO sensitivity setting. |
-| Flash            | int      | Flash setting (1 for used, 0 for not used). |
-| ImageWidth       | int      | Width of the image in pixels. |
-| ImageLength      | int      | Height of the image in pixels. |
-| Altitude         | float    | Altitude data (if available). |
-| LatitudeRef      | string   | Latitude reference (N/S). |
-| Latitude         | float    | Latitude coordinate. |
-| LongitudeRef     | string   | Longitude reference (E/W). |
-| Longitude        | float    | Longitude coordinate. |
-
-**Example Request**:
-```sh
-GET http://example.com/getimagedetail/42
-```
-
-**Example Response**:
-```json
-{
-  "id": 42,
-  "filename": "image123.jpg",
-  "user_email": "john@example.com",
-  "ImageTitle": "Sunset View",
-  "ImageDescription": "A beautiful sunset over the ocean.",
-  "UploadDate": "2024-03-19T10:00:00Z",
-  "Tag": "Nature",
-  "ColorSpace": "sRGB",
-  "Created": "2024-03-18T08:00:00Z",
-  "Make": "Canon",
-  "Model": "EOS 5D Mark IV",
-  "FocalLength": 50.0,
-  "Aperture": 2.8,
-  "Exposure": 1/250,
-  "ISO": 100,
-  "Flash": 0,
-  "ImageWidth": 6000,
-  "ImageLength": 4000,
-  "Altitude": 12.5,
-  "LatitudeRef": "N",
-  "Latitude": 37.7749,
-  "LongitudeRef": "W",
-  "Longitude": -122.4194
-}
-```
+| Name             | Type     | Description                                                          |
+| ---------------- | -------- | -------------------------------------------------------------------- |
+| id               | int      | Unique image identifier.                                             |
+| filename         | string   | Image filename.                                                      |
+| user_email       | string   | Email of the user who uploaded the image.                            |
+| ImageTitle       | string   | Title of the image.                                                  |
+| ImageDescription | string   | Description of the image.                                            |
+| UploadDate       | datetime | Timestamp of when the image was uploaded.                            |
+| ai_prob          | float    | AI detection probability score (if applicable).                      |
+| Tag              | string   | Image category given by uploader: `AIGC`, `Original`, `Manipulation` |
+| ColorSpace       | string   | Color space of the image.                                            |
+| Created          | string   | Date and time when the image was created.                            |
+| Make             | string   | Camera manufacturer.                                                 |
+| Model            | string   | Camera model.                                                        |
+| FocalLength      | float    | Focal length used in the image.                                      |
+| Aperture         | float    | Aperture setting of the image.                                       |
+| Exposure         | float    | Exposure setting of the image.                                       |
+| ISO              | int      | ISO sensitivity setting.                                             |
+| Flash            | int      | Flash setting (1 for used, 0 for not used).                          |
+| ImageWidth       | int      | Width of the image in pixels.                                        |
+| ImageLength      | int      | Height of the image in pixels.                                       |
+| Altitude         | float    | Altitude data (if available).                                        |
+| LatitudeRef      | string   | Latitude reference (N/S).                                            |
+| Latitude         | float    | Latitude coordinate.                                                 |
+| LongitudeRef     | string   | Longitude reference (E/W).                                           |
+| Longitude        | float    | Longitude coordinate.                                                |
 
 ---
 
@@ -516,33 +298,9 @@ GET http://example.com/getimagedetail/42
 
 **Request Params**:
 
-| Name  | Type  | Description |
-| ----- | ----- | ----------- |
-| file  | file  | The image file to be uploaded (JPEG format). |
-
-**Example Request**:
-```sh
-POST http://example.com/uploadImage
-```
-
-**Example Response**:
-```json
-{
-  "message": "Image successfully uploaded",
-  "filename": "image123.jpg",
-  "file_size": 204800,
-  "file_type": "image/jpeg",
-  "metadata": {
-    "ColorSpace": "sRGB",
-    "Created": "2024-03-19T10:00:00Z",
-    "Make": "Canon",
-    "Model": "EOS 5D Mark IV",
-    "FocalLength": 50.0,
-    "Aperture": 2.8
-  },
-  "id": 42
-}
-```
+| Name | Type | Description                                  |
+| ---- | ---- | -------------------------------------------- |
+| file | file | The image file to be uploaded (JPEG format). |
 
 ---
 
@@ -552,12 +310,8 @@ POST http://example.com/uploadImage
 
 **Request Type**: Path Parameter
 
-**Example Request**:
-```sh
-GET http://example.com/image/42
-```
-
 **Response**:
+
 - Returns the image file in **JPEG** format as an attachment.
 - If the image does not exist, returns **404 Not Found**.
 
@@ -568,20 +322,16 @@ GET http://example.com/image/42
 **Description**: Retrieve an image file for analysis.
 
 **Response**:
+
 - If an image ID exists in the session, returns the image file.
 - If no image ID exists, returns a **400 Bad Request**.
 - If the image is not found, returns **404 Not Found**.
 
-**Example Request**:
-```sh
-GET http://example.com/getImage
-```
-
 **Response**:
+
 - Returns the image file in **JPEG** format.
 
 ---
-
 
 ## **Image Sorting and Filtering**
 
@@ -593,22 +343,9 @@ GET http://example.com/getImage
 
 **Request Params**:
 
-| Name | Type   | Description |
-| ---- | ------ | ----------- |
+| Name | Type   | Description                                 |
+| ---- | ------ | ------------------------------------------- |
 | tag  | string | (Optional) Filter images by a specific tag. |
-
-**Example Request**:
-```sh
-GET http://example.com/images/sortByTimeDesc?tag=Nature
-```
-
-**Example Response**:
-```json
-[
-  { "id": 42, "filename": "image123.jpg" },
-  { "id": 43, "filename": "image456.png" }
-]
-```
 
 ---
 
@@ -620,22 +357,9 @@ GET http://example.com/images/sortByTimeDesc?tag=Nature
 
 **Request Params**:
 
-| Name | Type   | Description |
-| ---- | ------ | ----------- |
+| Name | Type   | Description                                 |
+| ---- | ------ | ------------------------------------------- |
 | tag  | string | (Optional) Filter images by a specific tag. |
-
-**Example Request**:
-```sh
-GET http://example.com/images/sortByTimeAsce?tag=Portrait
-```
-
-**Example Response**:
-```json
-[
-  { "id": 44, "filename": "image789.jpg" },
-  { "id": 45, "filename": "image567.png" }
-]
-```
 
 ---
 
@@ -647,22 +371,9 @@ GET http://example.com/images/sortByTimeAsce?tag=Portrait
 
 **Request Params**:
 
-| Name | Type   | Description |
-| ---- | ------ | ----------- |
+| Name | Type   | Description                             |
+| ---- | ------ | --------------------------------------- |
 | tag  | string | (Optional) The tag to filter images by. |
-
-**Example Request**:
-```sh
-GET http://example.com/images/sortByTag?tag=Wildlife
-```
-
-**Example Response**:
-```json
-[
-  { "id": 50, "filename": "wildlife1.jpg", "description": "A lion in the wild" },
-  { "id": 51, "filename": "wildlife2.jpg", "description": "A herd of elephants" }
-]
-```
 
 ---
 
@@ -676,23 +387,9 @@ GET http://example.com/images/sortByTag?tag=Wildlife
 
 **Request Params**:
 
-| Name     | Type | Description |
-| -------- | ---- | ----------- |
+| Name     | Type | Description                                         |
+| -------- | ---- | --------------------------------------------------- |
 | image_id | int  | The unique identifier of the image to be favorited. |
-
-**Example Request**:
-```json
-{
-  "image_id": 42
-}
-```
-
-**Example Response**:
-```json
-{
-  "message": "Image added to favorites successfully."
-}
-```
 
 ---
 
@@ -704,23 +401,9 @@ GET http://example.com/images/sortByTag?tag=Wildlife
 
 **Request Params**:
 
-| Name     | Type | Description |
-| -------- | ---- | ----------- |
+| Name     | Type | Description                         |
+| -------- | ---- | ----------------------------------- |
 | image_id | int  | The unique identifier of the image. |
-
-**Example Request**:
-```json
-{
-  "image_id": 42
-}
-```
-
-**Example Response**:
-```json
-{
-  "isFavourite": true
-}
-```
 
 ---
 
@@ -732,23 +415,9 @@ GET http://example.com/images/sortByTag?tag=Wildlife
 
 **Request Params**:
 
-| Name     | Type | Description |
-| -------- | ---- | ----------- |
+| Name     | Type | Description                                                  |
+| -------- | ---- | ------------------------------------------------------------ |
 | image_id | int  | The unique identifier of the image to remove from favorites. |
-
-**Example Request**:
-```json
-{
-  "image_id": 42
-}
-```
-
-**Example Response**:
-```json
-{
-  "message": "Favorite removed successfully."
-}
-```
 
 ### **`GET /getAllFavouritesByUser`**
 
@@ -756,22 +425,9 @@ GET http://example.com/images/sortByTag?tag=Wildlife
 
 **Response**:
 
-| Name     | Type   | Description |
-| -------- | ------ | ----------- |
+| Name     | Type   | Description         |
+| -------- | ------ | ------------------- |
 | id       | int    | Favorite record ID. |
-| filename | string | Image filename. |
-
-**Example Request**:
-```sh
-GET http://example.com/getAllFavouritesByUser
-```
-
-**Example Response**:
-```json
-[
-  { "id": 1, "filename": "image1.jpg" },
-  { "id": 2, "filename": "image2.png" }
-]
-```
+| filename | string | Image filename.     |
 
 ---
