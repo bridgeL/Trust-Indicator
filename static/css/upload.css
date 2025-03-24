@@ -133,6 +133,11 @@
     width: 100%;
     margin-bottom: 2%;
 }
+
+.location.image-information-container{
+    height: 30%;
+}
+
 .image-header{
     font-weight: bold;
     height: 16%;
@@ -151,6 +156,12 @@
     justify-content: start;
     padding-left: 10px;
 }
+
+.location .image-box{
+    height: 28%;
+}
+
+
 .box-title{
     width: 30%;
     height: 100%;
@@ -194,10 +205,9 @@
     justify-content: start;
     padding-left: 10px;
 }
-.choice{
+.choice, .visibility{
     width: 100%;
     height: 45%;
-    margin-top: -15%;
     display: flex;
 
     flex-direction: column;
@@ -213,7 +223,7 @@
     background-color: white;
 }
 
-.choice-title{
+.choice-title, .visibility-title{
     width: 100%;
     height: 20%;
     display: flex;

@@ -265,7 +265,7 @@
                     </div>
 
                     <div class="metadata-item item2">
-                        <div class="image-information-container">
+                        <div class="image-information-container location">
                             <div class="image-header"><i class="fa fa-map-marker" style="font-size:24px"></i>&nbsp;&nbsp;&nbsp;Location information</div>
                             <div class="image-box gray">
                                 <p class="box-title">Altitude</p>
@@ -279,16 +279,7 @@
                                 <p class="box-title">Longitude</p>
                                 <p class="box-content" id="metadata-Longitude"></p>
                             </div>
-                            <div class="image-box white">
-                                <p class="box-title"></p>
-                                <p class="box-content"></p>
-                            </div>
-                            <div class="image-box white">
-                                <p class="box-title"></p>
-                                <p class="box-content"></p>
-                            </div>
                         </div>
-
 
                         <div class="choice">
                             <div class="choice-title">
@@ -316,6 +307,22 @@
                                     <label for="Manipulation-switch" style=" padding-left: 10px;font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;color: #333;font-size: 16px;font-weight: 600"><i class='far fa-file-image' style="padding-right: 12px;font-size: 20px"></i>Manipulation Image</label>
                                     <label class="switch">
                                         <input type="radio" name="image-type" id="Manipulation-switch" value="Manipulation">
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="visibility">
+                            <div class="visibility-title">
+                                Determine Image Visibility
+                            </div>
+
+                            <div style="width: 100%;height: 70%">
+                                <div class="switch-container">
+                                    <label for="original-switch" style=" padding-left: 10px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;color: #333;font-size: 15px;font-weight: 600">  <i class='fas fa-camera-retro' style="padding-right: 5px;font-size: 18px"></i> Private</label>
+                                    <label class="switch">
+                                        <input type="checkbox" name="image-visibility" id="visibility-switch" value="private">
                                         <span class="slider round"></span>
                                     </label>
                                 </div>
