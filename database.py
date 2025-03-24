@@ -40,6 +40,12 @@ class Feedback(db.Model):
     feedback_type = db.Column(db.String(120))
     content = db.Column(db.Text)
 
+# for visibility enum
+class VisibilityEnum:
+    PUBLIC = "public"
+    PRIVATE = "private"
+    CHOICES = (PUBLIC, PRIVATE)
+
 class Image(db.Model):
     __tablename__ = 'images'
     id = db.Column(db.Integer, primary_key=True)
@@ -51,7 +57,9 @@ class Image(db.Model):
     UploadDate = db.Column(db.Text)
     Tag = db.Column(db.Text)
     # Add fields for metadata
-    IsPrivate = db.Column(db.Boolean, default=False)
+    # IsPrivate = db.Column(db.Boolean, default=False)
+    Visibility = db.Column(db.String(10), nullable=False, default=VisibilityEnum.PUBLIC)
+    Result = db.Column(db.Float, nullable=True)
 
     ColorSpace = db.Column(db.Text)
     Created = db.Column(db.Text)
