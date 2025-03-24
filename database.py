@@ -79,6 +79,14 @@ class Image(db.Model):
     Longitude = db.Column(db.Text, nullable=True)
 
 
+def create_database(app):
+    """Create SQLite database if it doesn't exist."""
+    if not os.path.exists('instance/MyDatabase.db'):
+        with app.app_context():
+            # db.init_app(app)
+            db.create_all()
+        print("Database created!")
+
 if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == '--recreate':
         db_path = os.path.join(app.instance_path, 'instance/MyDatabase.db')
