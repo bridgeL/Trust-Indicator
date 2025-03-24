@@ -548,6 +548,8 @@ def upload_file():
                 new_image = Image(
                     filename=filename,
                     data=file_data,
+                    # Set default visibility to private when the image is first uploaded
+                    visibility="private",
                     user_email=current_user.Email,
                     UploadDate=upload_time,  # Save the upload time
                     ColorSpace=colorSpace if colorSpace else 'None',
@@ -770,6 +772,19 @@ def update_image_desc():
     else:
         return jsonify({'status': 'failed'})
 
+@app.route('/api/updateImageVisibility', methods=['POST'])
+def update_image_visibility():
+    data = request.get_json()
+    image_id = data.get('image_id')
+    visibility = data.get('visibility')
+
+    image = Image.query.get(image_id)
+    if image and visibility in ['public', 'private']:
+        image.visibility = visibility
+        db.session.commit()
+        return jsonify({'status': 'success'})
+    else:
+        return jsonify({'status': 'failed'})
 
 @app.route('/getImage')
 def get_image_for_analysis():
