@@ -4,10 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 import sys 
 
-# preparation to create db
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///MyDatabase.db'
-db = SQLAlchemy(app)
+# # preparation to create db
+# app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///MyDatabase.db'
+# db = SQLAlchemy(app)
+db = SQLAlchemy()
 
 class User(UserMixin, db.Model):
     __tablename__ = 'user'
@@ -87,13 +88,13 @@ def create_database(app):
             db.create_all()
         print("Database created!")
 
-if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == '--recreate':
-        db_path = os.path.join(app.instance_path, 'instance/MyDatabase.db')
-        if os.path.exists(db_path):
-            os.remove(db_path)
-        print("Database removed.")
+# if __name__ == "__main__":
+#     if len(sys.argv) > 1 and sys.argv[1] == '--recreate':
+#         db_path = os.path.join(app.instance_path, 'instance/MyDatabase.db')
+#         if os.path.exists(db_path):
+#             os.remove(db_path)
+#         print("Database removed.")
     
-    with app.app_context():
-        db.create_all()
-        print("Database created.")
+#     with app.app_context():
+#         db.create_all()
+#         print("Database created.")
