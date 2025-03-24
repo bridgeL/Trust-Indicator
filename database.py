@@ -1,9 +1,14 @@
 import os
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from flask import Flask
+import sys 
 
+# # preparation to create db
+# app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///MyDatabase.db'
+# db = SQLAlchemy(app)
 db = SQLAlchemy()
-
 
 class User(UserMixin, db.Model):
     __tablename__ = 'user'
@@ -16,34 +21,6 @@ class User(UserMixin, db.Model):
     Is_Admin = db.Column(db.Boolean, default=False)
     images = db.relationship('Image', backref='user', lazy=True)
 
-
-# class Metadata(db.Model):
-#     __tablename__ = 'Metadata'
-#     ImageID = db.Column(db.Integer, primary_key=True)
-#     File_Size = db.Column(db.Integer)
-#     File_Type = db.Column(db.Text)
-#     MIME_Type = db.Column(db.Text)
-#     Create_Date = db.Column(db.Text)
-#     Modify_Date = db.Column(db.Text)
-#     Color_Space = db.Column(db.Text)
-#     Make = db.Column(db.Text)
-#     Model = db.Column(db.Text)
-#     Lens = db.Column(db.Text)
-#     Focal_Length = db.Column(db.REAL)
-#     Aperture = db.Column(db.REAL)
-#     Exposure = db.Column(db.REAL)
-#     ISO = db.Column(db.Integer)
-#     Flash = db.Column(db.Text)
-#     Altitude = db.Column(db.REAL)
-#     Latitude = db.Column(db.REAL)
-#     Longitude = db.Column(db.REAL)
-#     Software = db.Column(db.Text)
-
-# class EFMigrationsHistory(db.Model):
-#     __tablename__ = '_EFMigrationsHistory'
-#     MigrationId = db.Column(db.Text, primary_key=True)
-#     ProductVersion = db.Column(db.Text)
-#
 class Favorites(db.Model):
     __tablename__ = 'favorites'
     RecordID = db.Column(db.Integer, primary_key=True)
@@ -55,7 +32,6 @@ class Favorites(db.Model):
     Comment = db.Column(db.Text)
     Create_Date = db.Column(db.Text)
 
-
 class Feedback(db.Model):
     __tablename__ = 'feedback'
     id = db.Column(db.Integer, primary_key=True)
@@ -65,6 +41,11 @@ class Feedback(db.Model):
     feedback_type = db.Column(db.String(120))
     content = db.Column(db.Text)
 
+# for visibility enum
+class VisibilityEnum:
+    PUBLIC = "public"
+    PRIVATE = "private"
+    CHOICES = (PUBLIC, PRIVATE)
 
 class Image(db.Model):
     __tablename__ = 'images'
@@ -77,6 +58,10 @@ class Image(db.Model):
     UploadDate = db.Column(db.Text)
     Tag = db.Column(db.Text)
     # Add fields for metadata
+    # IsPrivate = db.Column(db.Boolean, default=False)
+    visibility = db.Column(db.String(10), nullable=False, default=VisibilityEnum.PUBLIC)
+    ai_prob = db.Column(db.Float, nullable=True)
+
     ColorSpace = db.Column(db.Text)
     Created = db.Column(db.Text)
     Make = db.Column(db.Text)
@@ -102,3 +87,14 @@ def create_database(app):
             # db.init_app(app)
             db.create_all()
         print("Database created!")
+
+# if __name__ == "__main__":
+#     if len(sys.argv) > 1 and sys.argv[1] == '--recreate':
+#         db_path = os.path.join(app.instance_path, 'instance/MyDatabase.db')
+#         if os.path.exists(db_path):
+#             os.remove(db_path)
+#         print("Database removed.")
+    
+#     with app.app_context():
+#         db.create_all()
+#         print("Database created.")
