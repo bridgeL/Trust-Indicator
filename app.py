@@ -606,6 +606,7 @@ def upload_file():
                 new_image = Image(
                     filename=filename,
                     data=file_data,
+                    visibility="private",
                     user_email=current_user.Email,
                     UploadDate=upload_time,  # Save the upload time
                     ColorSpace=None,
