@@ -215,6 +215,11 @@
     justify-content: flex-start;
 
 }
+
+.visibility{
+    height: 20%;
+    margin-bottom: -20%;
+}
 .gray {
     background-color: #eeeeee;
 }
