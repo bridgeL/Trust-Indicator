@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const imageDisplayDiv = document.querySelector('.image-display');
     const downloadButton = document.getElementById('Download');
 
-    fetch('/getImage')
+    fetch('/getImage', {credentials: 'include'})
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');

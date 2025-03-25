@@ -270,6 +270,47 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 let uploadedImageId = null;
 
+async function updateImageSettings(formData, uploadedImageId, selectedImageVisibility) {
+  try {
+    const res1 = await fetch("/updateImageType", {
+      method: "POST",
+      body: formData,
+      credentials: "include" // session cookie
+    });
+
+    const data1 = await res1.json();
+    if (data1.status !== "success") {
+      console.log("Failed to update image type.");
+      return;
+    }
+
+    const res2 = await fetch("/api/updateImageVisibility", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include", // cookie
+      body: JSON.stringify({
+        image_id: uploadedImageId,
+        visibility: selectedImageVisibility
+      })
+    });
+
+    const data2 = await res2.json();
+    if (data2.status !== "success") {
+      console.log("Failed to update image visibility.");
+      return;
+    }
+
+    console.log("Image type and visibility updated successfully.");
+    window.location.href = "/analysis";
+
+  } catch (error) {
+    console.error("Error updating image settings:", error);
+  }
+}
+
+
 function analysis(event) {
   var selectedImageType = document.querySelector(
     'input[name="image-type"]:checked'
@@ -283,46 +324,7 @@ function analysis(event) {
     var formData = new FormData();
     formData.append("imageId", uploadedImageId);
     formData.append("imageType", selectedImageType.value);
-
-    fetch("/updateImageType", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status === "success") {
-          console.log("Image type updated successfully.");
-          window.location.href = "/analysis";
-        } else {
-          console.log("Failed to update image type.");
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-
-    fetch("/api/updateImageVisibility", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        image_id: uploadedImageId, // 替换为你要修改的图片ID
-        visibility: selectedImageVisibility, // 或 'public'
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.status === "success") {
-          console.log("Image visibility updated successfully.");
-          window.location.href = "/analysis";
-        } else {
-          console.log("Failed to update image visibility.");
-        }
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    updateImageSettings(formData, uploadedImageId, selectedImageVisibility);
   } else {
     var analysisButton = document.querySelector(".analysis-button");
     var analysisButtonText = analysisButton.querySelector("span");
