@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
       analysisButton.classList.add("no-selection");
       analysisButtonText.textContent = "Please Select Type!";
     } else {
+      analysis(event); // 调用 analysis 函数
     }
   });
 });
@@ -272,6 +273,7 @@ let uploadedImageId = null;
 
 async function updateImageSettings(formData, uploadedImageId, selectedImageVisibility) {
   try {
+    // Update image type
     const res1 = await fetch("/updateImageType", {
       method: "POST",
       body: formData,
@@ -284,6 +286,26 @@ async function updateImageSettings(formData, uploadedImageId, selectedImageVisib
       return;
     }
 
+    // Update image description
+    const desc = document.getElementById("image-desc").value;
+        if (desc && uploadedImageId) {
+            const descFormData = new FormData();
+            descFormData.append("image_id", uploadedImageId);
+            descFormData.append("desc", desc);
+            const descRes = await fetch("/api/updateImageDesc", {
+                method: "POST",
+                body: descFormData,
+                credentials: "include" // session cookie
+            });
+            const descData = await descRes.json();
+            if (descData.status !== "success") {
+                console.log("Failed to update image description.");
+                return;
+            }
+            console.log("Image description updated successfully.");
+        }
+
+    // Update image visibility
     const res2 = await fetch("/api/updateImageVisibility", {
       method: "POST",
       headers: {
@@ -302,8 +324,9 @@ async function updateImageSettings(formData, uploadedImageId, selectedImageVisib
       return;
     }
 
-    console.log("Image type and visibility updated successfully.");
-    window.location.href = "/analysis";
+    console.log("Image type, description, and visibility updated successfully.");
+    // 修改跳转逻辑，传递 image_id
+    window.location.href = `/analysis?image_id=${uploadedImageId}`;
 
   } catch (error) {
     console.error("Error updating image settings:", error);

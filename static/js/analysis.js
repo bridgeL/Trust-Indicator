@@ -133,7 +133,32 @@ let downloadBlobUrl = null;
 document.addEventListener('DOMContentLoaded', function() {
     const imageDisplayDiv = document.querySelector('.image-display');
     const downloadButton = document.getElementById('Download');
+    const descriptionElement = document.getElementById('image-description');
 
+    // 从URL获取image_id
+  const urlParams = new URLSearchParams(window.location.search);
+  const imageId = urlParams.get('image_id');
+
+  if (imageId) {
+    // 获取图片描述
+    fetch(`/getimagedetail/${imageId}`, { credentials: 'include' })
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch image details');
+        return response.json();
+      })
+      .then(data => {
+        const description = data.ImageDescription || 'No description provided.';
+        descriptionElement.textContent = description;
+      })
+      .catch(error => {
+        console.error('Error fetching image details:', error);
+        descriptionElement.textContent = 'Failed to load description.';
+      });
+  } else {
+    descriptionElement.textContent = 'No image ID provided.';
+  }
+
+    // 显示图片
     fetch('/getImage', {credentials: 'include'})
         .then(response => {
             if (!response.ok) {

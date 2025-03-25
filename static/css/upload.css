@@ -372,3 +372,30 @@ input:checked + .slider:before {
         display: none;
     }
 }
+
+.description-container {
+    margin-top: 15px;
+    width: 95%;
+    margin-left: 2.5%;
+    text-align: left;
+}
+
+#image-desc {
+    width: 100%;
+    height: 50px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+    resize: vertical;
+    font-size: 14px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+    color: #444;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #00467F;
+}
