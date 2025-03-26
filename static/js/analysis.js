@@ -1,8 +1,8 @@
-function AnalysisOtherImage(event){
-    window.location.href='/upload'
+function AnalysisOtherImage(event) {
+    window.location.href = '/upload'
 }
-function Gohome(event){
-    window.location.href='/'
+function Gohome(event) {
+    window.location.href = '/'
 }
 
 
@@ -37,8 +37,8 @@ function countdown() {
         numberElement.textContent = currentNumber - 1;
     } else {
         clearInterval(interval);
-        document.querySelector('.warpper-wait').style.display="none";
-        document.querySelector('.result').style.display="flex";
+        document.querySelector('.warpper-wait').style.display = "none";
+        document.querySelector('.result').style.display = "flex";
     }
 }
 var interval = setInterval(countdown, 1000);
@@ -78,6 +78,51 @@ function getRandomScores() {
         score_manipulation: Math.round(score_manipulation)
     };
 }
+
+// Trustworthiness Score algorithm
+document.addEventListener('DOMContentLoaded', function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const imageId = urlParams.get('image_id');
+
+    fetch(`/getimagedetail/${imageId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+
+            // Todo: const aiProb = data.ai_prob;
+            const aiProb = 0.2;
+            const tag = data.Tag;
+
+
+            function computeTrustScore(ai_prob, tag) {
+                let baseScore;
+                switch (tag) {
+                    case 'Original':
+                        baseScore = 90;
+                        break;
+                    case 'AIGC':
+                        baseScore = 50;
+                        break;
+                    case 'Manipulation':
+                        baseScore = 30;
+                        break;
+                    default:
+                        baseScore = 70;
+                }
+
+                let score = baseScore * ((100 - ai_prob) / 100);
+                score = Math.max(0, Math.min(100, score));
+                return Math.round(score);
+            }
+            const trustScore = computeTrustScore(aiProb, tag);
+            document.getElementById('trust-score').textContent = trustScore + "%";
+        })
+        .catch(error => console.error('Error fetching image detail:', error));
+});
+
 
 let scores = getRandomScores();
 let score_original = scores.score_original;
@@ -130,36 +175,36 @@ document.getElementById("signal2").style.backgroundRepeat = 'no-repeat';
 
 // show image
 let downloadBlobUrl = null;
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const imageDisplayDiv = document.querySelector('.image-display');
     const downloadButton = document.getElementById('Download');
     const descriptionElement = document.getElementById('image-description');
 
     // 从URL获取image_id
-  const urlParams = new URLSearchParams(window.location.search);
-  const imageId = urlParams.get('image_id');
+    const urlParams = new URLSearchParams(window.location.search);
+    const imageId = urlParams.get('image_id');
 
-  if (imageId) {
-    // 获取图片描述
-    fetch(`/getimagedetail/${imageId}`, { credentials: 'include' })
-      .then(response => {
-        if (!response.ok) throw new Error('Failed to fetch image details');
-        return response.json();
-      })
-      .then(data => {
-        const description = data.ImageDescription || 'No description provided.';
-        descriptionElement.textContent = description;
-      })
-      .catch(error => {
-        console.error('Error fetching image details:', error);
-        descriptionElement.textContent = 'Failed to load description.';
-      });
-  } else {
-    descriptionElement.textContent = 'No image ID provided.';
-  }
+    if (imageId) {
+        // 获取图片描述
+        fetch(`/getimagedetail/${imageId}`, { credentials: 'include' })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to fetch image details');
+                return response.json();
+            })
+            .then(data => {
+                const description = data.ImageDescription || 'No description provided.';
+                descriptionElement.textContent = description;
+            })
+            .catch(error => {
+                console.error('Error fetching image details:', error);
+                descriptionElement.textContent = 'Failed to load description.';
+            });
+    } else {
+        descriptionElement.textContent = 'No image ID provided.';
+    }
 
     // 显示图片
-    fetch('/getImage', {credentials: 'include'})
+    fetch('/getImage', { credentials: 'include' })
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -177,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
             imageDisplayDiv.style.backgroundRepeat = 'no-repeat';  // Don't repeat the background image
         })
         .catch(error => console.error('Error fetching image:', error));
-    downloadButton.addEventListener('click', function() {
+    downloadButton.addEventListener('click', function () {
         if (downloadBlobUrl) {
 
             const downloadLink = document.createElement('a');
