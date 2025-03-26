@@ -536,5 +536,24 @@ body {
     border-bottom: 1px solid #ffffff;
 }
 
+.image-description-container {
+    width: 80%;
+    margin: 10px auto;
+    text-align: center;
+}
 
+.description-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #00467F;
+    margin-bottom: 5px;
+}
+
+.description-content {
+    font-size: 14px;
+    color: #333;
+    word-wrap: break-word; 
+    max-width: 100%;
+    min-height: 20px; 
+}
 

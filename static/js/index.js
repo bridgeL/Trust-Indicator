@@ -344,3 +344,4 @@ window.addEventListener('resize', function() {
     // Update the transform position of the gallery
     gallery.style.transform = `translateX(-${currentSlide * divWidth}px)`;
 });
+

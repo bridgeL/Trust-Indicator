@@ -721,6 +721,7 @@ def sorted_images_by_time_asce():
 def sorted_images_by_tag():
     user_email = current_user.Email
     tag = request.args.get('tag', default='')
+    search = request.args.get('search', default='')
 
     # Filter logic:
     # 1. If the image is public, it is always included.
@@ -733,6 +734,10 @@ def sorted_images_by_tag():
     # Apply tag filter if provided
     if tag:
         query = query.filter(Image.Tag == tag)
+
+    if search:
+        search_pattern = f"%{search}%"  # using sql like
+        query = query.filter(Image.ImageDescription.ilike(search_pattern))
 
     images = query.all()
     image_info = [{'id': image.id, 'filename': image.filename, 'description': image.ImageDescription} for image in images]
