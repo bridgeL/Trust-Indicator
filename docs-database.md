@@ -6,7 +6,7 @@ This document provide database stufff we have developed.
 
 Our database has four tables until now, they are `favorites`, `feedback`, `images` and `user`
 
-## `favorites` Table
+## 1. `favorites` Table
 
 The `favorites` tables define the pictures the relation that a user and their favorite image
 
@@ -22,9 +22,9 @@ The `favorites` tables define the pictures the relation that a user and their fa
 | Create_Date | TEXT          | Date when the record was created         | "2025-03-26"     |
 
 
-## `feedback` Table
+## 2. `feedback` Table
 
-| Column Name    | Data Type      | Description                          | Example               |
+| Column Name    | Data Type    | Description                          | Example               |
 |---------------|---------------|--------------------------------------|-----------------------|
 | id            | INTEGER       | Unique identifier for each feedback entry | 1                |
 | name          | VARCHAR(120)  | Name of the person giving feedback  | "John Doe"           |
@@ -33,5 +33,26 @@ The `favorites` tables define the pictures the relation that a user and their fa
 | feedback_type | VARCHAR(120)  | Type of feedback (e.g., complaint, suggestion, praise) | "Suggestion" |
 | content       | TEXT          | Detailed feedback content           | "Great service!"     |
 
-## `images` Table
+## 3. `images` Table
+
+The `image` table stores both image files and its related metadata. The metadata like user information, image EXIF metadata and AI-generated probabilities can also be stored in this table.
+
+| id                | INTEGER       | Unique identifier for each image record         | 1                       |
+| filename          | VARCHAR(150)  | Name of the image file                          | "photo1.jpg"           |
+| data              | BLOB          | Binary image data                               | (Binary Data)           |
+| user_email        | VARCHAR(120)  | Email of the user who uploaded the image       | "user@example.com"      |
+| ImageTitle        | TEXT          | Title of the image                             | "Sunset View"           |
+| ImageDescription  | TEXT          | Description of the image                       | "A beautiful sunset."   |
+| UploadDate        | TEXT          | Date when the image was uploaded               | "2025-03-26"           |
+| Tag              | TEXT          | Tags associated with the image                 | "Nature, Sunset"        |
+| visibility       | VARCHAR(10)   | Visibility status (public/private)             | "public"                |
+| ai_prob          | FLOAT         | AI-generated probability score (if applicable) | 0.95                    |
+| ColorSpace       | TEXT          | Color space of the image                       | "sRGB"                  |
+| Created         | TEXT          | Image creation date (metadata)                 | "2025-03-25"           |
+| Make            | TEXT          | Camera manufacturer                            | "Canon"                 |
+| Model           | TEXT          | Camera model                                   | "EOS 5D Mark IV"       |
+| FocalLength     | FLOAT         | Focal length of the lens (mm)                  | 50.0                    |
+| Aperture        | FLOAT         | Aperture setting (f-number)                    | 2.8                     |
+
+
 
