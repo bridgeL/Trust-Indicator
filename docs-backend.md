@@ -375,6 +375,16 @@
 | ---- | ------ | --------------------------------------- |
 | tag  | string | (Optional) The tag to filter images by. |
 
+**Response**:
+
+A JSON **array** of objects. Each object has the following structure:
+
+| Name        | Type   | Description         |
+| ----------- | ------ | ------------------- |
+| id          | int    | Favorite record ID. |
+| filename    | string | Image filename.     |
+| description | string | Image description.  |
+
 ---
 
 ## **Favorites Management**
