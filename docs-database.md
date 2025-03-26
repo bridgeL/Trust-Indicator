@@ -8,6 +8,8 @@ Our database has four tables until now, they are `favorites`, `feedback`, `image
 
 ## `favorites` Table
 
+The `favorites` tables define the pictures the relation that a user and their favorite image
+
 | Column Name  | Data Type    | Description                              | Example          |
 |-------------|---------------|------------------------------------------|------------------|
 | RecordID    | INTEGER       | Unique identifier for each record       | 1                |
@@ -18,3 +20,18 @@ Our database has four tables until now, they are `favorites`, `feedback`, `image
 | Is_Favorite | INTEGER       | Flag to mark favorite images (0 = No, 1 = Yes) | 1         |
 | Comment     | TEXT          | User's comment on the image              | "Nice picture!"  |
 | Create_Date | TEXT          | Date when the record was created         | "2025-03-26"     |
+
+
+## `feedback` Table
+
+| Column Name    | Data Type      | Description                          | Example               |
+|---------------|---------------|--------------------------------------|-----------------------|
+| id            | INTEGER       | Unique identifier for each feedback entry | 1                |
+| name          | VARCHAR(120)  | Name of the person giving feedback  | "John Doe"           |
+| email         | VARCHAR(120)  | Email of the person giving feedback | "john@example.com"   |
+| date          | TEXT          | Date when feedback was submitted    | "2025-03-26"         |
+| feedback_type | VARCHAR(120)  | Type of feedback (e.g., complaint, suggestion, praise) | "Suggestion" |
+| content       | TEXT          | Detailed feedback content           | "Great service!"     |
+
+## `images` Table
+
