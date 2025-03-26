@@ -4,12 +4,13 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 import sys 
 
-# preparation to create db
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///MyDatabase.db'
-db = SQLAlchemy(app)
+# # preparation to create db
+# app = Flask(__name__)
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///MyDatabase.db'
+# db = SQLAlchemy(app)
+db = SQLAlchemy()
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     UserName = db.Column(db.String(80), nullable=False)
@@ -79,13 +80,21 @@ class Image(db.Model):
     Longitude = db.Column(db.Text, nullable=True)
 
 
-if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == '--recreate':
-        db_path = os.path.join(app.instance_path, 'instance/MyDatabase.db')
-        if os.path.exists(db_path):
-            os.remove(db_path)
-        print("Database removed.")
+def create_database(app):
+    """Create SQLite database if it doesn't exist."""
+    if not os.path.exists('instance/MyDatabase.db'):
+        with app.app_context():
+            # db.init_app(app)
+            db.create_all()
+        print("Database created!")
+
+# if __name__ == "__main__":
+#     if len(sys.argv) > 1 and sys.argv[1] == '--recreate':
+#         db_path = os.path.join(app.instance_path, 'instance/MyDatabase.db')
+#         if os.path.exists(db_path):
+#             os.remove(db_path)
+#         print("Database removed.")
     
-    with app.app_context():
-        db.create_all()
-        print("Database created.")
+#     with app.app_context():
+#         db.create_all()
+#         print("Database created.")

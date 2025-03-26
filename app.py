@@ -5,12 +5,8 @@ from datetime import datetime, timedelta
 from io import BytesIO
 
 import jwt
-import torch
-from PIL import Image as PILImage
-from torchvision import transforms
 from requests import Session
-from flask import Flask, render_template, request, flash, redirect, url_for, jsonify, send_file, session
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template, request, url_for, jsonify, send_file, session
 from flask_session import Session
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from flask_mail import Mail, Message
@@ -188,6 +184,8 @@ def getImageDetail(image_id):
         'ImageTitle': image.ImageTitle,
         'ImageDescription': image.ImageDescription,
         'UploadDate': image.UploadDate,
+        'ai_prob': image.ai_prob,
+        'visibility': image.visibility,
         'Tag': image.Tag,
         'ColorSpace': image.ColorSpace,
         'Created': image.Created,
@@ -550,6 +548,8 @@ def upload_file():
                 new_image = Image(
                     filename=filename,
                     data=file_data,
+                    # Set default visibility to private when the image is first uploaded
+                    visibility="private",
                     user_email=current_user.Email,
                     UploadDate=upload_time,  # Save the upload time
                     ColorSpace=colorSpace if colorSpace else 'None',
@@ -606,6 +606,7 @@ def upload_file():
                 new_image = Image(
                     filename=filename,
                     data=file_data,
+                    visibility="private",
                     user_email=current_user.Email,
                     UploadDate=upload_time,  # Save the upload time
                     ColorSpace=None,
@@ -718,19 +719,27 @@ def sorted_images_by_time_asce():
 
 @app.route('/images/sortByTag')
 def sorted_images_by_tag():
+    user_email = current_user.Email
     tag = request.args.get('tag', default='')
-    if tag == 'Original':
-        images = Image.query.filter(Image.Tag == 'Original').all()
-    elif tag == 'Manipulation':
-        images = Image.query.filter(Image.Tag == 'Manipulation').all()
-    elif tag == 'AIGC':
-        images = Image.query.filter(Image.Tag == 'AIGC').all()
-    else:
-        images = Image.query.all()
 
-    image_info = [{'id': image.id, 'filename': image.filename} for image in images]
+    # Filter logic:
+    # 1. If the image is public, it is always included.
+    # 2. If the image is private, it is only included if the user's email matches the image's owner.
+    query = Image.query.filter(
+        (Image.visibility == 'public') |
+        ((Image.visibility == 'private') & (Image.user_email == user_email))
+    )
+
+    # Apply tag filter if provided
+    if tag:
+        query = query.filter(Image.Tag == tag)
+
+    images = query.all()
+    image_info = [{'id': image.id, 'filename': image.filename, 'description': image.ImageDescription} for image in images]
+
+    # Shuffle the images to return them in random order
     random.shuffle(image_info)
-    print(image_info)
+
     return jsonify(image_info)
 
 
@@ -749,6 +758,34 @@ def update_image_type():
     else:
         return jsonify({'status': 'failed'})
 
+@app.route('/api/updateImageDesc', methods=['POST'])
+@login_required
+def update_image_desc():
+    image_id = request.form['image_id']
+    new_desc = request.form['desc']
+
+    image = Image.query.get(image_id)
+
+    if image and image.user_email == current_user.Email:
+        image.ImageDescription = new_desc
+        db.session.commit()
+        return jsonify({'status': 'success'})
+    else:
+        return jsonify({'status': 'failed'})
+
+@app.route('/api/updateImageVisibility', methods=['POST'])
+def update_image_visibility():
+    data = request.get_json()
+    image_id = data.get('image_id')
+    visibility = data.get('visibility')
+
+    image = Image.query.get(image_id)
+    if image and visibility in ['public', 'private']:
+        image.visibility = visibility
+        db.session.commit()
+        return jsonify({'status': 'success'})
+    else:
+        return jsonify({'status': 'failed'})
 
 @app.route('/getImage')
 def get_image_for_analysis():

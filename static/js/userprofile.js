@@ -128,8 +128,8 @@ function fadeOutAlert(alertBox) {
 document.addEventListener('DOMContentLoaded', function() {
     fetch('/getcurrentuserimages').then(response => response.json()).then(data => {
         const gallery = document.getElementById('uploaded-images');
-        var firstIndicatorImages = ['5.png', '5.png', /* ... more icons ... */];
-        var secondIndicatorImages = ['6.png', '6.png', /* ... more icons ... */];
+        var firstIndicatorImages = ['aigc.png', 'aigc.png', /* ... more icons ... */];
+        var secondIndicatorImages = ['origin.png', 'origin.png', /* ... more icons ... */];
 
         if (data.length > 0) {
             document.getElementById("no-uploaded").style.display = "none"; // 改为display属性
@@ -172,8 +172,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     fetch('/getAllFavouritesByUser').then(response => response.json()).then(data => {
         const gallery = document.getElementById('favourite-images');
-        var firstIndicatorImages = ['5.png', '5.png', /* ... more icons ... */];
-        var secondIndicatorImages = ['6.png', '6.png', /* ... more icons ... */];
+        var firstIndicatorImages = ['aigc.png', 'aigc.png', /* ... more icons ... */];
+        var secondIndicatorImages = ['origin.png', 'origin.png', /* ... more icons ... */];
 
         if (data.length > 0) {
             document.getElementById("no-favourite").style.display = "none";
