@@ -160,3 +160,113 @@ The `images` table stores image files along with metadata, user association, and
 |------------|--------|---------|
 | `favorites` | `SELECT` | Verify if the image exists in the user's favorites. |
 | `favorites` | `DELETE` | Remove the image from the user's favorites. |
+
+---
+
+### **`POST /change-password`**
+
+**Description**: Changes the user's password after verifying the old password.
+
+**Database Usage**:
+
+| Table  | Action  | Purpose |
+|--------|--------|---------|
+| `user` | `UPDATE` | Update the user's password with the new hashed password. |
+
+---
+
+### **`POST /reset-password`**
+
+**Description**: Resets the user's password using the provided new password.
+
+**Database Usage**:
+
+| Table  | Action  | Purpose |
+|--------|--------|---------|
+| `user` | `UPDATE` | Update the user's password with the new hashed password. |
+
+---
+
+
+### **`POST /submit_feedback`**
+
+**Description**: Submits user feedback and sends a confirmation email.
+
+**Database Usage**:
+
+| Table      | Action  | Purpose |
+|------------|--------|---------|
+| `feedback` | `INSERT` | Add a new feedback entry with the user's information (name, email, feedback type, content, date). |
+
+---
+
+### **`POST /register`**
+
+**Description**: Registers a new user by creating a user entry in the database.
+
+**Database Usage**:
+
+| Table  | Action  | Purpose |
+|--------|--------|---------|
+| `user` | `INSERT` | Add a new user entry with the provided details (username, email, legal name, password, profile photo). |
+
+---
+
+### **`POST /uploadImage`**
+
+**Description**: Upload a new image to the database.
+
+**Database Usage**:
+
+| Table  | Action  | Purpose |
+|--------|--------|---------|
+| `image` | `INSERT` | Add a new image, include **all** columns showed in image table. |
+
+---
+
+### **`POST /updateImageType`**  
+**Description**: Updates the tag (type) of an image in the database.  
+
+**Database Usage**:  
+
+| Table  | Action  | Purpose  |  
+|--------|--------|---------|  
+| `images`  | `SELECT`  | Retrieve the image record by `imageId`. |  
+| `images`  | `UPDATE`  | Update the `Tag` field with the new image type. |  
+| `session`  | `SET`  | Store `image_id_for_analysis` in session for further processing. |  
+
+---
+
+### **`POST /api/updateImageDesc`**  
+**Description**: Updates the description of an image in the database.  
+
+**Database Usage**:  
+
+| Table  | Action  | Purpose  |  
+|--------|--------|---------|  
+| `images`  | `SELECT`  | Retrieve the image record by `image_id`. |  
+| `images`  | `UPDATE`  | Update the `ImageDescription` field with the new description. |
+
+---
+
+### **`POST /api/updateImageVisibility`**  
+**Description**: Updates the visibility of an image in the database.  
+
+**Database Usage**:  
+
+| Table  | Action  | Purpose  |  
+|--------|--------|---------|  
+| `images`  | `SELECT`  | Retrieve the image record by `image_id`. |  
+| `images`  | `UPDATE`  | Update the `visibility` field to either `public` or `private`. |  
+
+---
+
+### **`POST /change_profile_photo`**  
+**Description**: Updates the profile photo selection for the current user.  
+
+**Database Usage**:  
+
+| Table  | Action  | Purpose  |  
+|--------|--------|---------|  
+| `users`  | `SELECT`  | Retrieve the user record by `current_user.id`. |  
+| `users`  | `UPDATE`  | Update the `ProfilePhotoNO` field with the selected image number. |  
