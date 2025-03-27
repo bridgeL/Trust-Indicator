@@ -6,6 +6,8 @@ This document provide database stufff we have developed.
 
 Our database has four tables until now, they are `favorites`, `feedback`, `images` and `user`
 
+---
+
 ## 1. Table Name: `user`
 
 ### Description:
@@ -29,6 +31,7 @@ The `user` table stores information about system users, including login credenti
 ### Indexes:
 - `Email` is indexed as it is marked `UNIQUE`, which helps optimize lookups.
 
+---
 
 ## 2. Table Name: `favorites`
 
@@ -58,6 +61,7 @@ The `favorites` table stores users' favorite images, including additional metada
 ### Indexes:
 - `UserID` and `ImageID` should be indexed for efficient lookups.
 
+---
 
 ## 3. Table Name: `feedback`
 
@@ -80,6 +84,8 @@ The `feedback` table stores user feedback submissions, including user details, f
 
 ### Indexes:
 - `email` should be indexed. 
+
+---
 
 ## 4. Table Name: `images`
 
@@ -126,6 +132,31 @@ The `images` table stores image files along with metadata, user association, and
 ### Indexes:
 - `user_email` should be indexed for efficient querying of images by user.
 
-### Relationships:
-- **Many-to-One:** Each image is uploaded by a single user (`user_email` → `user.Email`).
-- **One-to-Many:** An image can have multiple associated `favorites` records.
+---
+
+# Database Uses
+
+### **`POST /addToFavourite`**
+
+**Description**: Adds an image to the user's favorites list.
+
+**Database Usage**:
+
+| Table      | Action  | Purpose |
+|------------|--------|---------|
+| `favorites` | `SELECT` | Check if the image is already in the user's favorites. |
+| `images`   | `SELECT` | Retrieve the image filename to store in `favorites`. |
+| `favorites` | `INSERT` | Add a new favorite entry for the user with `Is_Favorite = 1`. |
+
+---
+
+### **`POST /deleteFavourite`**
+
+**Description**: Removes an image from the user's favorites list.
+
+**Database Usage**:
+
+| Table      | Action  | Purpose |
+|------------|--------|---------|
+| `favorites` | `SELECT` | Verify if the image exists in the user's favorites. |
+| `favorites` | `DELETE` | Remove the image from the user's favorites. |
