@@ -57,3 +57,75 @@ The `favorites` table stores users' favorite images, including additional metada
 
 ### Indexes:
 - `UserID` and `ImageID` should be indexed for efficient lookups.
+
+
+## 3. Table Name: `feedback`
+
+### Description:
+The `feedback` table stores user feedback submissions, including user details, feedback type, and content.
+
+### Columns:
+
+| Column Name      | Data Type      | Constraints                     | Description                          |
+|-----------------|--------------|---------------------------------|--------------------------------------|
+| `id`           | `Integer`     | `Primary Key`                   | Unique identifier for each feedback entry. |
+| `name`         | `String(120)` | `NOT NULL`                      | Name of the user providing feedback. |
+| `email`        | `String(120)` | `NOT NULL`                      | Email address of the user. |
+| `date`         | `Text`        |                                 | Timestamp of when the feedback was submitted. |
+| `feedback_type`| `String(120)` |                                 | Type of feedback (e.g., complaint, suggestion). |
+| `content`      | `Text`        |                                 | The detailed feedback content. |
+
+### Primary Key:
+- `id`
+
+### Indexes:
+- `email` should be indexed. 
+
+## 4. Table Name: `images`
+
+### Description:
+The `images` table stores image files along with metadata, user association, and AI-related attributes.
+
+### Columns:
+
+| Column Name       | Data Type        | Constraints                              | Description                          |
+|------------------|----------------|------------------------------------------|--------------------------------------|
+| `id`            | `Integer`       | `Primary Key`                            | Unique identifier for each image. |
+| `filename`      | `String(150)`   |                                          | Name of the image file. |
+| `data`          | `LargeBinary`   |                                          | Binary data representing the image. |
+| `user_email`    | `String(120)`   | `Foreign Key → user.Email, NOT NULL`     | Email of the user who uploaded the image. |
+| `ImageTitle`    | `Text`          |                                          | Title of the image. |
+| `ImageDescription` | `Text`       |                                          | Description or caption for the image. |
+| `UploadDate`    | `Text`          |                                          | Date when the image was uploaded. |
+| `Tag`           | `Text`          |                                          | Tags associated with the image for searchability. |
+| `visibility`    | `String(10)`    | `DEFAULT 'public'`                       | Image visibility status (`public` or `private`). |
+| `ai_prob`       | `Float`         |                                          | AI-generated probability for categorization. |
+| `ColorSpace`    | `Text`          |                                          | Image color space information. |
+| `Created`       | `Text`          |                                          | Date when the image was originally created. |
+| `Make`          | `Text`          |                                          | Camera manufacturer. |
+| `Model`         | `Text`          |                                          | Camera model used to take the image. |
+| `FocalLength`   | `Float`         | `Nullable`                               | Focal length of the camera lens. |
+| `Aperture`      | `Float`         | `Nullable`                               | Aperture setting at the time of capture. |
+| `Exposure`      | `Float`         | `Nullable`                               | Exposure time (shutter speed). |
+| `ISO`           | `Float`         | `Nullable`                               | ISO sensitivity setting. |
+| `Flash`         | `Float`         | `Nullable`                               | Whether the flash was used (1 = Yes, 0 = No). |
+| `ImageWidth`    | `Float`         | `Nullable`                               | Width of the image in pixels. |
+| `ImageLength`   | `Float`         | `Nullable`                               | Length of the image in pixels. |
+| `Altitude`      | `Text`          | `Nullable`                               | Altitude where the image was taken. |
+| `LatitudeRef`   | `Text`          |                                          | Latitude reference (N/S). |
+| `Latitude`      | `Text`          | `Nullable`                               | Latitude coordinate. |
+| `LongitudeRef`  | `Text`          |                                          | Longitude reference (E/W). |
+| `Longitude`     | `Text`          | `Nullable`                               | Longitude coordinate. |
+
+### Primary Key:
+- `id`
+
+### Foreign Keys:
+- `user_email` → References `user.Email` (links images to the user who uploaded them).
+
+### Indexes:
+- `user_email` should be indexed for efficient querying of images by user.
+
+### Relationships:
+- **Many-to-One:** Each image is uploaded by a single user (`user_email` → `user.Email`).
+- **One-to-Many:** An image can have multiple associated `favorites` records.
