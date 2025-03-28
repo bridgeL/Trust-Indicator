@@ -12,7 +12,6 @@ class FavoritesTest(DatabaseTest):
     def test_favorite_insertion(self):
         """Test inserting a favorite record."""
         with self.app.app_context():
-            # First, create a test user and image
             user = User(UserName="testuser", Email="test@example.com", Password="hashed_password")
             db.session.add(user)
             db.session.commit()
@@ -21,7 +20,6 @@ class FavoritesTest(DatabaseTest):
             db.session.add(image)
             db.session.commit()
 
-            # Insert a favorite record
             favorite = Favorites(
                 ImageID=image.id,
                 UserID=user.id,
@@ -34,7 +32,6 @@ class FavoritesTest(DatabaseTest):
             db.session.add(favorite)
             db.session.commit()
 
-            # Fetch and verify
             fetched_favorite = Favorites.query.filter_by(UserID=user.id, ImageID=image.id).first()
             self.assertIsNotNone(fetched_favorite)
             self.assertEqual(fetched_favorite.FileName, "test_image.jpg")
@@ -63,11 +60,9 @@ class FavoritesTest(DatabaseTest):
             db.session.add(favorite)
             db.session.commit()
 
-            # Update favorite status
             favorite.Is_Favorite = 0
             db.session.commit()
 
-            # Verify update
             updated_favorite = Favorites.query.filter_by(UserID=user.id, ImageID=image.id).first()
             self.assertEqual(updated_favorite.Is_Favorite, 0)
 
