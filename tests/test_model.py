@@ -4,7 +4,7 @@ from flask import Flask
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from database import db, create_database, User, Image, Feedback, Favorites\
+from database import db, create_database, User, Image, Feedback, Favorites
 
 ## this model is used to create a new app instance for each test with in-memory DB
 ## it not used directly in this file but it is used in other test files.
