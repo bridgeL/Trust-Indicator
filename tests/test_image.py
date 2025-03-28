@@ -150,8 +150,5 @@ class ImageTest(DatabaseTest):
             updated_image = db.session.query(Image).filter_by(filename="public_to_private.jpg").first()
             self.assertEqual(updated_image.visibility, "private")
 
-
-
-
 if __name__ == '__main__':
     unittest.main()
