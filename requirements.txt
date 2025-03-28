@@ -8,3 +8,5 @@ flask_mail
 werkzeug
 sqlalchemy
 Pillow
+pytest       # for unit tests
+pytest-flask # for unit tests
