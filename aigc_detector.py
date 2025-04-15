@@ -24,13 +24,21 @@ class AigcDetector:
     def _create_client(self) -> OpenApiClient:
         """
         创建阿里云API客户端
-        使用直接设置的AccessKey和Secret
+        从环境变量获取AccessKey和Secret
         """
         try:
+            # 从环境变量获取凭据
+            access_key_id = os.environ.get("ALIBABA_CLOUD_ACCESS_KEY_ID")
+            access_key_secret = os.environ.get("ALIBABA_CLOUD_ACCESS_KEY_SECRET")
+            
+            # 检查是否成功获取凭据
+            if not access_key_id or not access_key_secret:
+                print("警告: 未设置阿里云AccessKey环境变量，AIGC检测功能将使用模拟结果")
+                return None
+                
             config = open_api_models.Config(
-                # 直接设置AccessKey和Secret
-                access_key_id="LTAI5tDP3VHKsY1PSqynsWGD",
-                access_key_secret="lA91EngVvxRTVqdONPEFHvJB5Uej6t"
+                access_key_id=access_key_id,
+                access_key_secret=access_key_secret
             )
             # 使用新加坡区域的端点
             config.endpoint = 'green-cip.ap-southeast-1.aliyuncs.com'
@@ -66,8 +74,13 @@ class AigcDetector:
             str: 公开可访问的图片URL，如果上传失败则返回None
         """
         try:
-            # 使用提供的ImgBB API密钥
-            api_key = "7c6cb91b706a37b3e9ab7e23c35bb9c1"
+            # 从环境变量获取ImgBB API密钥
+            api_key = os.environ.get("IMGBB_API_KEY")
+            
+            # 检查是否成功获取API密钥
+            if not api_key:
+                print("警告: 未设置IMGBB_API_KEY环境变量，无法上传图片")
+                return None
             
             # ImgBB API端点
             url = "https://api.imgbb.com/1/upload"
