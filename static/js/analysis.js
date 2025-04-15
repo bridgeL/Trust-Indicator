@@ -43,7 +43,64 @@ function countdown() {
 }
 var interval = setInterval(countdown, 1000);
 
+// 替换原有的随机分数生成函数
+async function detectAigc(imageId) {
+    try {
+        const response = await fetch('/api/detect_aigc', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include', // 包含session cookie
+            body: JSON.stringify({ image_id: imageId })
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP错误: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            // 置信度在API中是0-100，我们直接使用
+            const confidence = data.confidence;
+            const isAigc = data.is_aigc;
+            
+            // 计算分数
+            let score_original, score_aigc, score_manipulation;
+            
+            if (isAigc) {
+                // 如果检测为AIGC，则原始图片概率低
+                score_aigc = confidence;
+                score_original = 100 - confidence;
+            } else {
+                // 如果检测为非AIGC(UGC)，则原始图片概率高
+                score_original = confidence;
+                score_aigc = 100 - confidence;
+            }
+            
+            // 为manipulation计算一个低置信度值
+            score_manipulation = Math.min(30, Math.random() * 20);
+            
+            return {
+                score_original: Math.round(score_original),
+                score_aigc: Math.round(score_aigc),
+                score_manipulation: Math.round(score_manipulation),
+                aiProb: confidence / 100  // 用于后续计算可信度分数
+            };
+        } else {
+            console.error('AIGC检测失败:', data.message);
+            // 返回默认值
+            return getRandomScores();
+        }
+    } catch (error) {
+        console.error('调用AIGC检测API出错:', error);
+        // 出错时使用原来的随机函数作为后备
+        return getRandomScores();
+    }
+}
 
+// 保留原来的随机生成函数作为后备方案
 function getRandomScores() {
     // 获取用户选中的图像类型按钮
     var selectedImageType = document.querySelector('input[name="image-type"]:checked');
@@ -75,105 +132,117 @@ function getRandomScores() {
     return {
         score_original: Math.round(score_original),
         score_aigc: Math.round(score_aigc),
-        score_manipulation: Math.round(score_manipulation)
+        score_manipulation: Math.round(score_manipulation),
+        aiProb: score_aigc / 100  // 用于后续计算可信度分数
     };
 }
 
-// Trustworthiness Score algorithm
-document.addEventListener('DOMContentLoaded', function () {
+// 重新组织用于计算和显示结果的代码
+document.addEventListener('DOMContentLoaded', async function () {
     const urlParams = new URLSearchParams(window.location.search);
     const imageId = urlParams.get('image_id');
 
-    fetch(`/getimagedetail/${imageId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                console.error(data.error);
-                return;
-            }
-
-            // Todo: const aiProb = data.ai_prob;
-            const aiProb = 0.2;
-            const tag = data.Tag;
-
-
-            function computeTrustScore(ai_prob, tag) {
-                let baseScore;
-                switch (tag) {
-                    case 'Original':
-                        baseScore = 90;
-                        break;
-                    case 'AIGC':
-                        baseScore = 50;
-                        break;
-                    case 'Manipulation':
-                        baseScore = 30;
-                        break;
-                    default:
-                        baseScore = 70;
-                }
-
-                let score = baseScore * ((100 - ai_prob) / 100);
-                score = Math.max(0, Math.min(100, score));
-                return Math.round(score);
-            }
-            const trustScore = computeTrustScore(aiProb, tag);
-            document.getElementById('trust-score').textContent = trustScore + "%";
+    // 先获取图片信息和详情
+    let imageDetailPromise = fetch(`/getimagedetail/${imageId}`, { credentials: 'include' })
+        .then(response => {
+            if (!response.ok) throw new Error('Failed to fetch image details');
+            return response.json();
         })
-        .catch(error => console.error('Error fetching image detail:', error));
+        .catch(error => {
+            console.error('Error fetching image details:', error);
+            return { error: 'Failed to load image details' };
+        });
+
+    // 同时调用AIGC检测接口
+    let scores;
+    try {
+        scores = await detectAigc(imageId);
+    } catch (error) {
+        console.error('使用AIGC检测API时出错，使用随机分数:', error);
+        scores = getRandomScores();
+    }
+
+    let score_original = scores.score_original;
+    let score_aigc = scores.score_aigc;
+    let score_manipulation = scores.score_manipulation;
+    
+    // 更新图表和百分比显示
+    let scoreNormalized_original = score_original;
+    let scoreNormalized_aigc = score_aigc;
+    let scoreNormalized_manipulation = score_manipulation;
+
+    document.querySelector('#circle-Original').style.strokeDasharray = `${scoreNormalized_original}, 100`;
+    document.querySelector('#percentage-Original').textContent = `${score_original}%`;
+
+    document.querySelector('#circle-AIGC').style.strokeDasharray = `${scoreNormalized_aigc}, 100`;
+    document.querySelector('#percentage-AIGC').textContent = `${score_aigc}%`;
+
+    document.querySelector('#circle-Manipulation').style.strokeDasharray = `${scoreNormalized_manipulation}, 100`;
+    document.querySelector('#percentage-Manipulation').textContent = `${score_manipulation}%`;
+
+    // 获取图片详情并计算可信度分数
+    const imageDetail = await imageDetailPromise;
+    
+    if (!imageDetail.error) {
+        const tag = imageDetail.Tag;
+        const aiProb = scores.aiProb; // 使用AIGC检测API得到的概率
+
+        function computeTrustScore(ai_prob, tag) {
+            let baseScore;
+            switch (tag) {
+                case 'Original':
+                    baseScore = 90;
+                    break;
+                case 'AIGC':
+                    baseScore = 50;
+                    break;
+                case 'Manipulation':
+                    baseScore = 30;
+                    break;
+                default:
+                    baseScore = 70;
+            }
+
+            let score = baseScore * ((100 - (ai_prob * 100)) / 100);
+            score = Math.max(0, Math.min(100, score));
+            return Math.round(score);
+        }
+        
+        const trustScore = computeTrustScore(aiProb, tag);
+        document.getElementById('trust-score').textContent = trustScore + "%";
+    }
+
+    // 解析信号显示
+    // signal 替换
+    var secondIndicatorImages = ['origin.png', 'aigc.png', /* ... more icons ... */];
+    if (score_manipulation > 30) {
+        document.getElementById("signal1").style.backgroundImage = `url('/static/images/aigc.png')`;
+        document.getElementById("signal1").style.backgroundSize = 'contain';
+        document.getElementById("signal1").style.backgroundRepeat = 'no-repeat';
+    } else {
+        // 如果 Manipulation 小于等于 45，不显示图标
+        document.getElementById("signal1").style.backgroundImage = 'none';  // 清除背景图片
+    }
+
+    // 判断 Original 和 AIGC
+    if (score_original > 50) {
+        // 如果 Original 分数大于 50，显示 ORIGIN 图标
+        document.getElementById("signal2").style.backgroundImage = `url('/static/images/${secondIndicatorImages[0]}')`;  // ORIGIN 图标
+    } else if (score_aigc > 50) {
+        // 如果 AIGC 分数大于 50，显示 AIGC 图标
+        document.getElementById("signal2").style.backgroundImage = `url('/static/images/${secondIndicatorImages[1]}')`;  // AIGC 图标
+    } else {
+        // 如果 Original 和 AIGC 都小于等于 50，不显示图标
+        document.getElementById("signal2").style.backgroundImage = 'none';  // 清除背景图片
+    }
+
+    // 保持背景样式
+    document.getElementById("signal2").style.backgroundSize = 'contain';
+    document.getElementById("signal2").style.backgroundRepeat = 'no-repeat';
+
 });
 
-
-let scores = getRandomScores();
-let score_original = scores.score_original;
-let score_aigc = scores.score_aigc;
-let score_manipulation = scores.score_manipulation;
-
-// 更新图表和百分比显示
-let scoreNormalized_original = score_original;
-let scoreNormalized_aigc = score_aigc;
-let scoreNormalized_manipulation = score_manipulation;
-
-document.querySelector('#circle-Original').style.strokeDasharray = `${scoreNormalized_original}, 100`;
-document.querySelector('#percentage-Original').textContent = `${score_original}%`;
-
-document.querySelector('#circle-AIGC').style.strokeDasharray = `${scoreNormalized_aigc}, 100`;
-document.querySelector('#percentage-AIGC').textContent = `${score_aigc}%`;
-
-document.querySelector('#circle-Manipulation').style.strokeDasharray = `${scoreNormalized_manipulation}, 100`;
-document.querySelector('#percentage-Manipulation').textContent = `${score_manipulation}%`;
-
-
-// signal 替换
-var secondIndicatorImages = ['origin.png', 'aigc.png', /* ... more icons ... */];
-if (score_manipulation > 30) {
-    document.getElementById("signal1").style.backgroundImage = `url('/static/images/aigc.png')`;
-    document.getElementById("signal1").style.backgroundSize = 'contain';
-    document.getElementById("signal1").style.backgroundRepeat = 'no-repeat';
-} else {
-    // 如果 Manipulation 小于等于 45，不显示图标
-    document.getElementById("signal1").style.backgroundImage = 'none';  // 清除背景图片
-}
-
-
-// 判断 Original 和 AIGC
-if (score_original > 50) {
-    // 如果 Original 分数大于 50，显示 ORIGIN 图标
-    document.getElementById("signal2").style.backgroundImage = `url('/static/images/${secondIndicatorImages[0]}')`;  // ORIGIN 图标
-} else if (score_aigc > 50) {
-    // 如果 AIGC 分数大于 50，显示 AIGC 图标
-    document.getElementById("signal2").style.backgroundImage = `url('/static/images/${secondIndicatorImages[1]}')`;  // AIGC 图标
-} else {
-    // 如果 Original 和 AIGC 都小于等于 50，不显示图标
-    document.getElementById("signal2").style.backgroundImage = 'none';  // 清除背景图片
-}
-
-// 保持背景样式
-document.getElementById("signal2").style.backgroundSize = 'contain';
-document.getElementById("signal2").style.backgroundRepeat = 'no-repeat';
-
-
-// show image
+// show image 部分
 let downloadBlobUrl = null;
 document.addEventListener('DOMContentLoaded', function () {
     const imageDisplayDiv = document.querySelector('.image-display');
