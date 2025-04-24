@@ -79,6 +79,19 @@ class Image(db.Model):
     LongitudeRef = db.Column(db.Text)
     Longitude = db.Column(db.Text, nullable=True)
 
+class TrustProfile(db.Model):
+    __tablename__ = 'trust_profile'
+    id = db.Column(db.Integer, primary_key=True)
+    ImageID = db.Column(db.Integer, db.ForeignKey('images.id'), nullable=False)
+    
+    # Snippet fields
+    ai_prob = db.Column(db.String(50))
+    Metadata_Integrity = db.Column(db.String(100))
+    image_type = db.Column(db.String(100))
+
+    # Record trust profile generation time(optional)
+    created_at = db.Column(db.Text)
+
 
 def create_database(app):
     """Create SQLite database if it doesn't exist."""
