@@ -545,3 +545,37 @@ button {
     transform: scale(1.05);
     box-shadow: 0 4px 10px 0 rgba(0,0,0,0.25), 0 4px 20px 0 rgba(0,0,0,0.2);
 }
+
+.trust-report-container {
+    width: 100%;
+    margin-top: 20px;
+    padding: 10px;
+    border: 2px dashed #00467F;
+    border-radius: 8px;
+    background-color: #ffffff;
+    text-align: center;
+}
+
+.trust-header {
+    font-size: 18px;
+    font-weight: bold;
+    color: #00467F;
+    margin-bottom: 10px;
+}
+
+.trust-result-text {
+    font-size: 16px;
+    color: #333333;
+}
+
+.metadata-choice-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.metadata-choice-container .choice {
+    width: 100%;
+    margin-top: 10px;
+}

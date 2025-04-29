@@ -20,6 +20,22 @@ class User(UserMixin, db.Model):
     ProfilePhotoNO = db.Column(db.String(100))
     Is_Admin = db.Column(db.Boolean, default=False)
     images = db.relationship('Image', backref='user', lazy=True)
+    trust_profile = db.relationship('TrustProfile', backref='user', uselist=False, lazy=True)
+
+class TrustProfile(db.Model):
+    __tablename__ = 'trust_profile'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    last_updated = db.Column(db.Text)
+    snippets = db.relationship('TrustSnippet', backref='trust_profile', lazy=True)
+
+class TrustSnippet(db.Model):
+    __tablename__ = 'trust_snippet'
+    id = db.Column(db.Integer, primary_key=True)
+    profile_id = db.Column(db.Integer, db.ForeignKey('trust_profile.id'), nullable=False)
+    snippet_type = db.Column(db.String(50), nullable=False) # 'ai_threshold', 'megadata_complete'
+    settings = db.Column(db.Text) # Used to store settings in JSON format, such as the specific value of AI threshold
+    enabled = db.Column(db.Boolean, default=True)
 
 class Favorites(db.Model):
     __tablename__ = 'favorites'
