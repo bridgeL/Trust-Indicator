@@ -1,5 +1,6 @@
 const urlParams = new URLSearchParams(window.location.search);
 let imageId = urlParams.get('source');
+
 window.onload = function() {
     const userEmail = sessionStorage.getItem('userEmail');
     if (userEmail) {
@@ -13,7 +14,8 @@ window.onload = function() {
     img.className = "photo";
     imageDisplay.appendChild(img);
 
-    loadImage(imageId)
+    loadImage(imageId);
+    fetchTrustReport(imageId);  // <<< 新增：加载Trust Report
 
     const zoomInButton = document.getElementById('zoomIn');
     const zoomOutButton = document.getElementById('zoomOut');
@@ -35,7 +37,12 @@ window.onload = function() {
     }
     zoomInButton.addEventListener('click', () => resizeImageDisplay(true));
     zoomOutButton.addEventListener('click', () => resizeImageDisplay(false));
+
+
+    fetchTrustReport(imageId);
+
 };
+
 function loadImage(imageId){
     fetch(`/getimagedetail/${imageId}`)
     .then(response => {
@@ -277,4 +284,77 @@ function fadeOutAlert(alertBox) {
     setTimeout(function() {
         alertBox.remove();
     }, 500);
+}
+
+
+
+
+
+async function fetchTrustReport(imageId) {
+    try {
+        // Step 1: get Trust Profile
+        const profileRes = await fetch('/get_trust_profile', {
+            credentials: 'include'
+        });
+        const profileData = await profileRes.json();
+        const snippets = profileData.profile?.snippets || [];
+
+        // Step 2: 找到 AI Threshold
+        const thresholdSnippet = snippets.find(s => s.type === 'ai_threshold' && s.enabled);
+        let aiThreshold = 50;  // default
+
+        if (thresholdSnippet) {
+            try {
+                const parsedSettings = JSON.parse(thresholdSnippet.settings);
+                if (parsedSettings.threshold !== undefined) {
+                    aiThreshold = Number(parsedSettings.threshold);
+                }
+            } catch (e) {
+                console.warn("⚠️ Failed to parse threshold JSON:", e);
+            }
+        }
+
+        console.log("✅ AI Threshold used：", aiThreshold);
+
+        // Step 3: 获取 AIGC confidence
+        const aigcRes = await fetch('/api/detect_aigc', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ image_id: imageId })
+        });
+        const aigcData = await aigcRes.json();
+
+        let confidence = 0.0;
+        if (aigcData && aigcData.confidence !== undefined) {
+            confidence = aigcData.confidence; 
+        }
+
+        console.log("✅ AIGC detector confidence：", confidence);
+
+        // Step 4: 生成判断文本
+        const trustworthy = confidence * 100 < aiThreshold;
+        const resultText = `
+            <strong>AI Threshold：</strong>${aiThreshold}%<br>
+            <strong>Confidence from AIGC detector：</strong>${(confidence).toFixed(1)}<br>
+            ${trustworthy
+                ? "✅ According to user's trust profile, this picture is trustworthy."
+                : "❌ According to user's trust profile, this picture is not trustworthy."}
+        `.trim();
+
+        // Step 5: 更新 DOM
+        const trustResultElement = document.getElementById('trust-result');
+        if (trustResultElement) {
+            trustResultElement.innerHTML = resultText;
+        }
+
+    } catch (err) {
+        console.error("❌ Error for Trust Report：", err);
+        const trustResultElement = document.getElementById('trust-result');
+        if (trustResultElement) {
+            trustResultElement.innerHTML = '⚠️ Failed to load Trust Report.';
+        }
+    }
 }
