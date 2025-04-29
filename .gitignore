@@ -10,3 +10,9 @@ exif_data.txt
 .idea
 __pycache__
 .DS_Store
+
+# venv
+.venv
+
+# vscode  
+.vscode
