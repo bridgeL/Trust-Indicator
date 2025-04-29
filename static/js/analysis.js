@@ -67,7 +67,7 @@ async function detectAigc(imageId) {
             const isAigc = data.is_aigc;
             
             // 计算分数
-            let score_original, score_aigc, score_manipulation;
+            let score_original, score_aigc;
             
             if (isAigc) {
                 // 如果检测为AIGC，则原始图片概率低
@@ -79,14 +79,15 @@ async function detectAigc(imageId) {
                 score_aigc = 100 - confidence;
             }
             
-            // 为manipulation计算一个低置信度值
-            score_manipulation = Math.min(30, Math.random() * 20);
+            // 为manipulation计算一个随机值（1-20之间）
+            const score_manipulation = Math.random() * 19 + 1;
             
             return {
                 score_original: Math.round(score_original),
                 score_aigc: Math.round(score_aigc),
                 score_manipulation: Math.round(score_manipulation),
-                aiProb: confidence / 100  // 用于后续计算可信度分数
+                isAigc: isAigc,
+                confidence: confidence  // 保存原始的confidence值
             };
         } else {
             console.error('AIGC检测失败:', data.message);
@@ -126,15 +127,27 @@ function getRandomScores() {
         score_aigc = 100 - score_original;
     }
 
-    // 生成 10% 到 60% 之间的 manipulation 概率
-    score_manipulation = Math.random() * (30 - 1) + 1;
+    // 生成 1% 到 20% 之间的 manipulation 概率
+    score_manipulation = Math.random() * 19 + 1;
 
     return {
         score_original: Math.round(score_original),
         score_aigc: Math.round(score_aigc),
         score_manipulation: Math.round(score_manipulation),
-        aiProb: score_aigc / 100  // 用于后续计算可信度分数
+        isAigc: score_aigc > 50,  // 根据AIGC分数判断
+        confidence: score_aigc > 50 ? score_aigc : score_original  // 根据类型选择置信度
     };
+}
+
+// 修改计算可信度分数的函数，现在它直接基于检测结果
+function computeTrustScore(isAigc, confidence) {
+    // 如果检测为AI生成(isAigc为true)，则可信度分数 = 100 - confidence
+    // 如果检测为非AI生成(isAigc为false)，则可信度分数 = confidence
+    if (isAigc) {
+        return Math.round(Math.max(0, Math.min(100, 100 - confidence)));
+    } else {
+        return Math.round(Math.max(0, Math.min(100, confidence)));
+    }
 }
 
 // 重新组织用于计算和显示结果的代码
@@ -184,31 +197,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     const imageDetail = await imageDetailPromise;
     
     if (!imageDetail.error) {
-        const tag = imageDetail.Tag;
-        const aiProb = scores.aiProb; // 使用AIGC检测API得到的概率
-
-        function computeTrustScore(ai_prob, tag) {
-            let baseScore;
-            switch (tag) {
-                case 'Original':
-                    baseScore = 90;
-                    break;
-                case 'AIGC':
-                    baseScore = 50;
-                    break;
-                case 'Manipulation':
-                    baseScore = 30;
-                    break;
-                default:
-                    baseScore = 70;
-            }
-
-            let score = baseScore * ((100 - (ai_prob * 100)) / 100);
-            score = Math.max(0, Math.min(100, score));
-            return Math.round(score);
-        }
-        
-        const trustScore = computeTrustScore(aiProb, tag);
+        // 直接使用模型的检测结果计算可信度分数，不考虑标签(tag)
+        const trustScore = computeTrustScore(scores.isAigc, scores.confidence);
         document.getElementById('trust-score').textContent = trustScore + "%";
     }
 
@@ -220,7 +210,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         document.getElementById("signal1").style.backgroundSize = 'contain';
         document.getElementById("signal1").style.backgroundRepeat = 'no-repeat';
     } else {
-        // 如果 Manipulation 小于等于 45，不显示图标
+        // 如果 Manipulation 小于等于 30，不显示图标
         document.getElementById("signal1").style.backgroundImage = 'none';  // 清除背景图片
     }
 

@@ -1,15 +1,15 @@
-# AIGC 检测器
+# AIGC Detector
 
-本模块用于检测图像是否为AI生成内容(AIGC)。
+This module is used to detect whether images are AI-generated content (AIGC).
 
-## 环境变量设置
+## Environment Variables Setup
 
-为了使AIGC检测器正常工作，您需要设置以下环境变量:
+To make the AIGC detector work properly, you need to set the following environment variables:
 
-### 阿里云凭据
+### Alibaba Cloud Credentials
 
 ```bash
-# Windows 命令行
+# Windows Command Line
 set ALIBABA_CLOUD_ACCESS_KEY_ID=your_access_key_id
 set ALIBABA_CLOUD_ACCESS_KEY_SECRET=your_access_key_secret
 
@@ -18,45 +18,120 @@ export ALIBABA_CLOUD_ACCESS_KEY_ID=your_access_key_id
 export ALIBABA_CLOUD_ACCESS_KEY_SECRET=your_access_key_secret
 ```
 
-### ImgBB API密钥
+### ImgBB API Key
 
 ```bash
-# Windows 命令行
+# Windows Command Line
 set IMGBB_API_KEY=your_imgbb_api_key
 
 # Linux/macOS
 export IMGBB_API_KEY=your_imgbb_api_key
 ```
 
-## 注意事项
+### Using Environment Variables with Python
 
-1. 请勿将您的API密钥和访问凭据直接硬编码在源代码中
-2. 请勿将这些敏感信息提交到版本控制系统(如Git)
-3. 您可以考虑使用.env文件和python-dotenv库来管理环境变量，但确保.env文件已添加到.gitignore中
-
-## 使用示例
+You can also set the environment variables directly in your Python script:
 
 ```python
 import os
-from io import BytesIO
-from PIL import Image
-from aigc_detector import AigcDetector
 
-# 设置环境变量
 os.environ["ALIBABA_CLOUD_ACCESS_KEY_ID"] = "your_access_key_id"
 os.environ["ALIBABA_CLOUD_ACCESS_KEY_SECRET"] = "your_access_key_secret"
 os.environ["IMGBB_API_KEY"] = "your_imgbb_api_key"
+```
 
-# 创建检测器实例
+### Using .env Files
+
+Alternatively, you can use a .env file with the python-dotenv library:
+
+1. Install python-dotenv:
+```bash
+pip install python-dotenv
+```
+
+2. Create a .env file in your project root:
+
+```bash
+# Windows Command Line
+set ALIBABA_CLOUD_ACCESS_KEY_ID=your_access_key_id
+set ALIBABA_CLOUD_ACCESS_KEY_SECRET=your_access_key_secret
+
+# Linux/macOS
+export ALIBABA_CLOUD_ACCESS_KEY_ID=your_access_key_id
+export ALIBABA_CLOUD_ACCESS_KEY_SECRET=your_access_key_secret
+
+set IMGBB_API_KEY=your_imgbb_api_key
+
+# Linux/macOS
+export IMGBB_API_KEY=your_imgbb_api_key
+```
+
+## Important Notes
+
+1. Do not hardcode your API keys and access credentials directly in the source code
+2. Do not commit these sensitive information to version control systems (like Git)
+3. Make sure to add .env files to your .gitignore
+
+## Fallback to Simulated Results
+
+If the API credentials are not provided or the API call fails, the detector will automatically fall back to using simulated results. This is useful for testing or when you don't have access to the Alibaba Cloud API.
+
+## Usage Examples
+
+### Basic Usage
+
+```python
+from aigc_detector import AigcDetector
+
+# Create detector instance (make sure environment variables are set)
 detector = AigcDetector()
 
-# 从文件加载图像
+# Load image from file
 image_path = "path/to/your/image.jpg"
 with open(image_path, "rb") as f:
     image_bytes = f.read()
 
-# 检测图像
+# Detect image
 is_aigc, confidence = detector.is_aigc_image(image_bytes)
 
-print(f"是AI生成图像: {is_aigc}, 置信度: {confidence}%")
+print(f"Is AI-generated image: {is_aigc}, Confidence: {confidence}%")
+```
+
+### Using with the dotenv Library
+
+```python
+import os
+from dotenv import load_dotenv
+from aigc_detector import AigcDetector
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Create detector instance
+detector = AigcDetector()
+
+# Load and detect image
+with open("path/to/your/image.jpg", "rb") as f:
+    image_bytes = f.read()
+
+is_aigc, confidence = detector.is_aigc_image(image_bytes)
+print(f"Is AI-generated image: {is_aigc}, Confidence: {confidence}%")
+```
+
+### Getting Detailed Results
+
+```python
+from aigc_detector import AigcDetector
+
+detector = AigcDetector()
+
+with open("path/to/your/image.jpg", "rb") as f:
+    image_bytes = f.read()
+
+# Get detailed results including the original API response
+is_aigc, confidence, detailed_response = detector.detect_image_from_bytes(image_bytes)
+
+print(f"Is AI-generated: {is_aigc}")
+print(f"Confidence: {confidence}%")
+print(f"Detailed response: {detailed_response}")
 ``` 

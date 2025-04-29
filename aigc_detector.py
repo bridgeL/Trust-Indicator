@@ -1,270 +1,344 @@
+# coding=utf-8
+
 import os
 import base64
 import json
+import uuid
 from io import BytesIO
 import requests
 from typing import Dict, Any, Tuple, Optional
 import glob
 from PIL import Image
 
-from alibabacloud_tea_openapi.client import Client as OpenApiClient
-from alibabacloud_tea_openapi import models as open_api_models
-from alibabacloud_tea_util import models as util_models
+# Import keys from config file
+try:
+    from config_keys import (
+        ALIBABA_CLOUD_ACCESS_KEY_ID,
+        ALIBABA_CLOUD_ACCESS_KEY_SECRET,
+        IMGBB_API_KEY
+    )
+    print("Successfully loaded API keys from config_keys.py")
+except ImportError:
+    print("config_keys.py not found. Checking environment variables.")
+    # If config file is not available, try to use environment variables
+    ALIBABA_CLOUD_ACCESS_KEY_ID = os.environ.get("ALIBABA_CLOUD_ACCESS_KEY_ID")
+    ALIBABA_CLOUD_ACCESS_KEY_SECRET = os.environ.get("ALIBABA_CLOUD_ACCESS_KEY_SECRET")
+    IMGBB_API_KEY = os.environ.get("IMGBB_API_KEY")
+
+from alibabacloud_green20220302.client import Client
+from alibabacloud_green20220302 import models
+from alibabacloud_tea_openapi.models import Config
 from alibabacloud_tea_util.client import Client as UtilClient
+from alibabacloud_tea_util import models as util_models
 
 
 class AigcDetector:
     def __init__(self):
         """
-        初始化AIGC检测器
-        确保环境变量中设置了阿里云的AccessKey
+        Initialize AIGC Detector
+        Ensure Alibaba Cloud AccessKey is set in config_keys.py or environment variables
         """
+        # Get credentials from config or environment variables
+        self.access_key_id = ALIBABA_CLOUD_ACCESS_KEY_ID
+        self.access_key_secret = ALIBABA_CLOUD_ACCESS_KEY_SECRET
+        self.imgbb_api_key = IMGBB_API_KEY
+        
+        # Check if required credentials are set
+        if not self.access_key_id or not self.access_key_secret:
+            print("Warning: Alibaba Cloud credentials not set in config_keys.py or environment variables.")
+            print("Please set ALIBABA_CLOUD_ACCESS_KEY_ID and ALIBABA_CLOUD_ACCESS_KEY_SECRET.")
+        
+        if not self.imgbb_api_key:
+            print("Warning: ImgBB API key not set in config_keys.py or environment variables.")
+            print("Please set IMGBB_API_KEY.")
+            
+        # Use East China 2 (Shanghai) region endpoint
+        self.endpoint = 'green-cip.cn-shanghai.aliyuncs.com'
+        # Initialize client
         self.client = self._create_client()
     
-    def _create_client(self) -> OpenApiClient:
+    def _create_client(self):
         """
-        创建阿里云API客户端
-        从环境变量获取AccessKey和Secret
+        Create Alibaba Cloud API client
         """
         try:
-            # 从环境变量获取凭据
-            access_key_id = os.environ.get("ALIBABA_CLOUD_ACCESS_KEY_ID")
-            access_key_secret = os.environ.get("ALIBABA_CLOUD_ACCESS_KEY_SECRET")
-            
-            # 检查是否成功获取凭据
-            if not access_key_id or not access_key_secret:
-                print("警告: 未设置阿里云AccessKey环境变量，AIGC检测功能将使用模拟结果")
+            # Check if required credentials are set
+            if not self.access_key_id or not self.access_key_secret:
+                print("Error: Cannot create Alibaba Cloud client without credentials.")
                 return None
                 
-            config = open_api_models.Config(
-                access_key_id=access_key_id,
-                access_key_secret=access_key_secret
+            config = Config(
+                access_key_id=self.access_key_id,
+                access_key_secret=self.access_key_secret,
+                endpoint=self.endpoint,
+                connect_timeout=10,  # Set connection timeout to 10 seconds
+                read_timeout=10      # Set read timeout to 10 seconds
             )
-            # 使用新加坡区域的端点
-            config.endpoint = 'green-cip.ap-southeast-1.aliyuncs.com'
-            return OpenApiClient(config)
+            
+            return Client(config)
         except Exception as e:
-            print(f"创建阿里云客户端失败: {e}")
+            print(f"Failed to create Alibaba Cloud client: {e}")
             return None
-    
-    def _create_api_params(self) -> open_api_models.Params:
-        """
-        创建API调用参数
-        """
-        return open_api_models.Params(
-            action='ImageModeration',
-            version='2022-03-02',
-            protocol='HTTPS',
-            method='POST',
-            auth_type='AK',
-            style='RPC',
-            pathname='/',
-            req_body_type='formData',
-            body_type='json'
-        )
     
     def _upload_to_imgbb(self, image_bytes: bytes) -> str:
         """
-        将图片上传到ImgBB获取公开可访问的URL
+        Upload image to ImgBB to get a publicly accessible URL
         
         Args:
-            image_bytes: 图片二进制数据
+            image_bytes: Binary image data
             
         Returns:
-            str: 公开可访问的图片URL，如果上传失败则返回None
+            str: Publicly accessible image URL, returns None if upload fails
         """
         try:
-            # 从环境变量获取ImgBB API密钥
-            api_key = os.environ.get("IMGBB_API_KEY")
-            
-            # 检查是否成功获取API密钥
-            if not api_key:
-                print("警告: 未设置IMGBB_API_KEY环境变量，无法上传图片")
+            # Check if ImgBB API key is set
+            if not self.imgbb_api_key:
+                print("Error: Cannot upload to ImgBB without API key.")
                 return None
+                
+            # Use API key
+            api_key = self.imgbb_api_key
             
-            # ImgBB API端点
+            # ImgBB API endpoint
             url = "https://api.imgbb.com/1/upload"
             
-            # 准备请求参数 - 使用base64编码图片数据
+            # Prepare request parameters - use base64 encoded image data
             payload = {
                 "key": api_key,
                 "image": base64.b64encode(image_bytes).decode('utf-8')
             }
             
-            # 发送POST请求
-            print("上传图片到ImgBB...")
-            response = requests.post(url, data=payload)
+            # Send POST request
+            print("Uploading image to ImgBB...")
+            response = requests.post(url, data=payload, timeout=30)
             
-            # 处理响应
+            # Process response
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success", False):
-                    # 获取直接URL - 使用display_url，这个URL格式更标准
+                    # Get direct URL
                     image_url = data["data"]["display_url"]
-                    print(f"图片已成功上传到ImgBB，URL: {image_url}")
-                    
-                    # 打印完整的响应数据，帮助调试
-                    print(f"ImgBB响应数据: {json.dumps(data['data'], indent=2)}")
-                    
+                    print(f"Image successfully uploaded to ImgBB, URL: {image_url}")
                     return image_url
                 else:
-                    print(f"ImgBB上传失败: {data.get('error', {}).get('message', 'Unknown error')}")
-                    print(f"完整响应: {data}")
+                    print(f"ImgBB upload failed: {data.get('error', {}).get('message', 'Unknown error')}")
+                    print(f"Complete response: {data}")
             else:
-                print(f"ImgBB请求失败: HTTP {response.status_code}")
-                print(f"响应内容: {response.text}")
+                print(f"ImgBB request failed: HTTP {response.status_code}")
+                print(f"Response content: {response.text}")
                 
             return None
         except Exception as e:
-            print(f"ImgBB上传过程中出错: {e}")
+            print(f"Error during ImgBB upload: {e}")
             return None
     
     def detect_image_from_bytes(self, image_bytes: bytes) -> Tuple[bool, float, Dict[str, Any]]:
         """
-        从图片字节数据检测是否为AIGC生成的图片
+        Detect if an image is generated by AIGC from image binary data
         
         Args:
-            image_bytes: 图片的二进制数据
+            image_bytes: Binary image data
             
         Returns:
-            tuple: (是否AIGC生成, 置信度, 原始响应数据)
+            tuple: (is_aigc, confidence, original_response_data)
+            When is_aigc=True, corresponds to "AIGC" tag in the system
+            When is_aigc=False, corresponds to "Original" tag in the system
         """
         if not self.client:
-            print("客户端未初始化，无法检测图片")
-            return False, 0.0, {"error": "客户端未初始化"}
+            print("Client not initialized, cannot detect image")
+            return self._get_simulated_result()
         
         try:
-            # 1. 上传图片到ImgBB获取公开URL
+            # 1. Upload image to ImgBB to get public URL
             image_url = self._upload_to_imgbb(image_bytes)
             
-            # 如果上传失败，则使用默认的测试URL
+            # If upload fails, use default test URL
             if not image_url:
-                print("图片上传失败，使用默认的测试URL")
+                print("Image upload failed, using default test URL")
                 image_url = "https://cdn.pixabay.com/photo/2019/02/26/05/44/fireworks-4021214_1280.jpg"
             
-            # 2. 使用获取到的URL调用阿里云AIGC检测API
-            # 准备请求参数
-            params = self._create_api_params()
+            # Create RuntimeObject instance and set runtime parameters
+            runtime = util_models.RuntimeOptions(
+                connect_timeout=10000,  # Connection timeout set to 10 seconds (in milliseconds)
+                read_timeout=10000,     # Read timeout set to 10 seconds (in milliseconds)
+                autoretry=True,         # Enable auto retry
+                max_attempts=3          # Maximum retry attempts
+            )
             
-            # 准备请求体
-            body = {
-                'Service': 'aigcDetector_global',
-                'ServiceParameters': json.dumps({
-                    'imageUrl': image_url
-                })
+            # Construct detection parameters
+            service_parameters = {
+                'imageUrl': image_url,
+                'dataId': str(uuid.uuid1())
             }
             
-            print(f"发送AIGC检测请求，使用图片URL: {image_url}")
+            # Create detection request
+            image_moderation_request = models.ImageModerationRequest(
+                service='aigcDetector',
+                service_parameters=json.dumps(service_parameters)
+            )
             
-            # 创建请求和运行时选项
-            runtime = util_models.RuntimeOptions()
-            request = open_api_models.OpenApiRequest(body=body)
+            print(f"Sending AIGC detection request, using image URL: {image_url}")
             
-            # 调用API
-            response = self.client.call_api(params, request, runtime)
+            # Call API
+            response = self.client.image_moderation_with_options(image_moderation_request, runtime)
             
-            # 处理响应
-            if response and 'body' in response:
-                body_data = response['body']
-                print("收到AIGC检测响应:", body_data)
-                
-                # 检查响应状态
-                if body_data.get('Code') == 200:
-                    # 解析检测结果
-                    if 'Data' in body_data and 'Result' in body_data['Data']:
-                        results = body_data['Data']['Result']
-                        
-                        # 查找AIGC标签
-                        for result in results:
-                            if result.get('Label') == 'aigc':
-                                confidence = float(result.get('Confidence', 0))
-                                return True, confidence, body_data
-                        
-                        # 查找UGC标签
-                        for result in results:
-                            if result.get('Label') == 'ugc':
-                                confidence = float(result.get('Confidence', 0))
-                                return False, confidence, body_data
+            # Auto-routing - if Shanghai region fails, switch to Beijing region
+            if response is not None:
+                if UtilClient.equal_number(500, response.status_code) or (response.body is not None and 200 != response.body.code):
+                    print("Detection in Shanghai region failed, switching to Beijing region")
+                    # Temporarily create Beijing region client
+                    beijing_config = Config(
+                        access_key_id=self.access_key_id,
+                        access_key_secret=self.access_key_secret,
+                        endpoint='green-cip.cn-beijing.aliyuncs.com',
+                        connect_timeout=20,  # Connection timeout set to 20 seconds
+                        read_timeout=20      # Read timeout set to 20 seconds
+                    )
                     
-                    # 如果返回nonLabel或无法识别，使用模拟结果
-                    print("API返回的结果无法明确识别，使用模拟结果")
-                    return self._get_simulated_result()
-                else:
-                    print(f"API返回错误: {body_data.get('Msg', 'Unknown error')}")
-                    return self._get_simulated_result()
+                    beijing_client = Client(beijing_config)
+                    response = beijing_client.image_moderation_with_options(image_moderation_request, runtime)
             
-            print("API返回的响应格式不正确")
-            return self._get_simulated_result()
+            # Process response
+            if response is not None and response.status_code == 200:
+                result = response.body
+                print(f"Detection response: {result}")
+                
+                if result.code == 200 and hasattr(result, 'data') and hasattr(result.data, 'result'):
+                    results = result.data.result
+                    print(f"Detection results: {results}")
+                    
+                    # Find AIGC tag - returning True corresponds to "AIGC" tag in the system
+                    for result_item in results:
+                        if result_item.label == 'aigc':
+                            confidence = float(result_item.confidence)
+                            # If API returns value in 0-1 range, convert to 0-100
+                            if confidence <= 1.0:
+                                confidence = confidence * 100
+                            return True, confidence, {
+                                "Code": result.code,
+                                "Data": {
+                                    "Result": [{
+                                        "Label": result_item.label,
+                                        "Confidence": confidence,
+                                        "SystemTag": "AIGC",  # Corresponding tag in the system
+                                        "DisplayConfidence": f"{confidence:.1f}%"  # Confidence for frontend display
+                                    }]
+                                }
+                            }
+                    
+                    # Find UGC tag - returning False corresponds to "Original" tag in the system
+                    for result_item in results:
+                        if result_item.label == 'ugc':
+                            confidence = float(result_item.confidence)
+                            # If API returns value in 0-1 range, convert to 0-100
+                            if confidence <= 1.0:
+                                confidence = confidence * 100
+                            return False, confidence, {
+                                "Code": result.code,
+                                "Data": {
+                                    "Result": [{
+                                        "Label": result_item.label,
+                                        "Confidence": confidence,
+                                        "SystemTag": "Original",  # Corresponding tag in the system
+                                        "DisplayConfidence": f"{confidence:.1f}%"  # Confidence for frontend display
+                                    }]
+                                }
+                            }
+                    
+                    # Check if there's a nonLabel tag, which means undetermined
+                    for result_item in results:
+                        if result_item.label == 'nonLabel':
+                            # Return as non-AIGC, but with lower confidence
+                            confidence = float(result_item.confidence) if hasattr(result_item, 'confidence') else 50.0
+                            # If API returns value in 0-1 range, convert to 0-100
+                            if confidence <= 1.0:
+                                confidence = confidence * 100
+                            return False, confidence, {
+                                "Code": result.code,
+                                "Data": {
+                                    "Result": [{
+                                        "Label": result_item.label,
+                                        "Confidence": confidence,
+                                        "SystemTag": "Original",  # Default to Original
+                                        "DisplayConfidence": f"{confidence:.1f}%"  # Confidence for frontend display
+                                    }]
+                                }
+                            }
+                
+                # If results cannot be identified, use simulated results
+                print("Results from API cannot be clearly identified, using simulated results")
+                return self._get_simulated_result()
+            else:
+                print(f"Response error: Status code {response.status_code if response else 'None'}")
+                return self._get_simulated_result()
             
         except Exception as e:
-            print(f"AIGC检测过程中出错: {e}")
+            print(f"Error during AIGC detection: {e}")
             return self._get_simulated_result()
     
     def _get_simulated_result(self) -> Tuple[bool, float, Dict[str, Any]]:
         """
-        生成模拟的检测结果
+        Generate simulated detection results
         
         Returns:
-            tuple: (是否AIGC生成, 置信度, 原始响应数据)
+            tuple: (is_aigc, confidence, original_response_data)
         """
         import random
         is_aigc = random.choice([True, False])
         confidence = random.uniform(70, 95)
         
         if is_aigc:
-            # 模拟AIGC结果
+            # Simulate AIGC result
             simulated_result = {
-                "Msg": "success (simulated)", 
-                "RequestId": "simulated-id",
+                "Code": 200,
                 "Data": {
-                    "RiskLevel": "medium", 
                     "Result": [{
                         "Label": "aigc", 
                         "Confidence": confidence,
-                        "Description": "疑似由AIGC生成"
+                        "SystemTag": "AIGC",
+                        "DisplayConfidence": f"{confidence:.1f}%"
                     }]
-                }, 
-                "Code": 200
+                }
             }
             return True, confidence, simulated_result
         else:
-            # 模拟UGC结果
+            # Simulate UGC result
             simulated_result = {
-                "Msg": "success (simulated)", 
-                "RequestId": "simulated-id",
+                "Code": 200,
                 "Data": {
-                    "RiskLevel": "low", 
                     "Result": [{
                         "Label": "ugc", 
                         "Confidence": confidence,
-                        "Description": "非AIGC生成图片"
+                        "SystemTag": "Original",
+                        "DisplayConfidence": f"{confidence:.1f}%"
                     }]
-                }, 
-                "Code": 200
+                }
             }
             return False, confidence, simulated_result
 
     def is_aigc_image(self, image_bytes: bytes) -> Tuple[bool, float]:
         """
-        简化的接口，仅返回是否为AIGC生成及置信度
+        Simplified interface, only returns whether the image is AIGC generated and confidence level
         
         Args:
-            image_bytes: 图片的二进制数据
+            image_bytes: Binary image data
             
         Returns:
-            tuple: (是否AIGC生成, 置信度)
+            tuple: (is_aigc, confidence)
+            is_aigc: True corresponds to "AIGC" tag in the system, False corresponds to "Original" tag
+            confidence: 0-100 percentage value, will be converted to 0-1 range in app.py
         """
         is_aigc, confidence, _ = self.detect_image_from_bytes(image_bytes)
         return is_aigc, confidence
 
 
-# 测试代码
+# Test code
 if __name__ == "__main__":
-    # 仅在直接运行此文件时执行测试
+    # Execute test only when running this file directly
     detector = AigcDetector()
     
-    # 尝试查找测试图片
-    # 搜索几个可能的位置
+    # Try to find test images
+    # Search several possible locations
     possible_paths = [
         "uploads/*.jpg",
         "uploads/*.jpeg",
@@ -282,40 +356,42 @@ if __name__ == "__main__":
             break
     
     if test_image_path:
-        print(f"使用测试图片: {test_image_path}")
+        print(f"Using test image: {test_image_path}")
         with open(test_image_path, "rb") as f:
             test_image_bytes = f.read()
         
-        # 检查文件是否为空
+        # Check if file is empty
         if len(test_image_bytes) == 0:
-            print(f"警告: 测试图片 {test_image_path} 是空文件！将创建新的测试图片。")
+            print(f"Warning: Test image {test_image_path} is an empty file! Creating a new test image.")
             test_image_path = None
         else:
-            print(f"测试图片大小: {len(test_image_bytes)/1024:.2f} KB")
-            print("开始调用AIGC检测API...")
+            print(f"Test image size: {len(test_image_bytes)/1024:.2f} KB")
+            print("Starting AIGC detection API call...")
             is_aigc, confidence, response = detector.detect_image_from_bytes(test_image_bytes)
-            print(f"是否AIGC生成: {is_aigc}")
-            print(f"置信度: {confidence}")
-            print(f"原始响应: {response}")
+            system_tag = "AIGC" if is_aigc else "Original"
+            print(f"Is AIGC generated: {is_aigc} (System tag: {system_tag})")
+            print(f"Confidence: {confidence:.1f}%")
+            print(f"Original response: {response}")
     
-    # 如果没有找到有效的测试图片或文件为空，创建一个
+    # If no valid test image is found or the file is empty, create one
     if not test_image_path or len(test_image_bytes) == 0:
-        print("未找到有效的测试图片。创建一个新的测试图片...")
+        print("No valid test image found. Creating a new test image...")
         
         try:
-            # 创建一个简单的彩色图像 (100x100像素)
+            # Create a simple color image (100x100 pixels)
             img = Image.new('RGB', (100, 100), color = (73, 109, 137))
             test_image_path = "test_image.jpg"
             img.save(test_image_path)
             
-            print(f"使用创建的测试图片: {test_image_path}")
+            print(f"Using created test image: {test_image_path}")
             with open(test_image_path, "rb") as f:
                 test_image_bytes = f.read()
             
-            print("开始调用AIGC检测API...")
+            print("Starting AIGC detection API call...")
             is_aigc, confidence, response = detector.detect_image_from_bytes(test_image_bytes)
-            print(f"是否AIGC生成: {is_aigc}")
-            print(f"置信度: {confidence}")
-            print(f"原始响应: {response}")
+            system_tag = "AIGC" if is_aigc else "Original"
+            print(f"Is AIGC generated: {is_aigc} (System tag: {system_tag})")
+            print(f"Confidence: {confidence:.1f}%")
+            print(f"Original response: {response}")
         except Exception as e:
-            print(f"创建测试图片失败: {e}") 
+            print(f"Failed to create test image: {e}") 

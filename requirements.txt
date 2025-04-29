@@ -10,3 +10,4 @@ sqlalchemy
 Pillow
 alibabacloud_tea_openapi
 alibabacloud_tea_util
+alibabacloud_green20220302==2.20.0
