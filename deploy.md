@@ -150,7 +150,3 @@ tail -f logs/app.log
 2. Never document root password in public files
 3. All production passwords should be shared through secure channels
 4. Regularly check for Caddy and system security updates
-
----
-**Last Updated**: [Insert Date]  
-**Maintainer**: [Insert Name/Team]
