@@ -16,7 +16,7 @@ from sqlalchemy.exc import IntegrityError
 
 from trust_indicator.ExifExtractor.InterfaceTester import extract_exif_data
 from database import db, create_database, User, Image, Feedback, Favorites, TrustProfile, TrustSnippet
-# from aigc_detector import AigcDetector
+from aigc_detector import AigcDetector
 # from networks.resnet import resnet50  # Assuming resnet50 is defined in your project in the 'networks' module
 
 app = Flask(__name__)
