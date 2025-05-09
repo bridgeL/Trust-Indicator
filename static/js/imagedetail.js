@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
     checkAndSetFavourite();
-    hideModal();
+    // hideModal();
     function showModal() {
         modal.style.display = "block";
     }
