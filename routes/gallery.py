@@ -95,17 +95,24 @@ def sorted_images_by_time_asce():
 
 @bp.route("/images/sortByTag")
 def sorted_images_by_tag():
-    user_email = current_user.Email
+
     tag = request.args.get("tag", default="")
     search = request.args.get("search", default="")
 
     # Filter logic:
     # 1. If the image is public, it is always included.
     # 2. If the image is private, it is only included if the user's email matches the image's owner.
-    query = Image.query.filter(
-        (Image.visibility == "public")
-        | ((Image.visibility == "private") & (Image.user_email == user_email))
-    )
+
+    try:
+        user_email = current_user.Email
+        query = Image.query.filter(
+            (Image.visibility == "public")
+            | ((Image.visibility == "private") & (Image.user_email == user_email))
+        )
+
+    # AnonymousUserMixin
+    except AttributeError:
+        query = Image.query.filter((Image.visibility == "public"))
 
     # Apply tag filter if provided
     if tag:
