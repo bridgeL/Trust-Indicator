@@ -96,6 +96,12 @@ document.addEventListener("DOMContentLoaded", function () {
         var url = "/uploadImage"; // The route in your Flask app
         var formData = new FormData();
         formData.append("file", file);
+
+        var analysisButton = document.querySelector(".analysis-button");
+        var analysisButtonText = analysisButton.querySelector("span");
+        analysisButton.classList.add("no-selection");
+        analysisButtonText.textContent = "Uploading...";
+
         fetch(url, {
             method: "POST",
             body: formData,
@@ -119,6 +125,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         result.filename;
                 }
                 updateMetadataOnPage(result.metadata);
+
+                analysisButton.classList.remove("no-selection");
+                analysisButtonText.textContent = "Analysis Now!";
             })
             .catch((error) => {
                 console.error("Error:", error);
