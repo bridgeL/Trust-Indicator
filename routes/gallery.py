@@ -95,13 +95,10 @@ def sorted_images_by_time_asce():
 
 @bp.route("/images/sortByTag")
 def sorted_images_by_tag():
-
     tag = request.args.get("tag", default="")
     search = request.args.get("search", default="")
-
-    # Filter logic:
-    # 1. If the image is public, it is always included.
-    # 2. If the image is private, it is only included if the user's email matches the image's owner.
+    page = request.args.get("page", default=1, type=int)
+    per_page = request.args.get("per_page", default=10, type=int)
 
     try:
         user_email = current_user.Email
@@ -109,33 +106,36 @@ def sorted_images_by_tag():
             (Image.visibility == "public")
             | ((Image.visibility == "private") & (Image.user_email == user_email))
         )
-
-    # AnonymousUserMixin
     except AttributeError:
         query = Image.query.filter((Image.visibility == "public"))
 
-    # Apply tag filter if provided
     if tag:
         query = query.filter(Image.Tag == tag)
 
     if search:
-        search_pattern = f"%{search}%"  # using sql like
+        search_pattern = f"%{search}%"
         query = query.filter(Image.ImageDescription.ilike(search_pattern))
 
-    images = query.all()
+    # 添加分页
+    paginated_images = query.paginate(page=page, per_page=per_page, error_out=False)
+
     image_info = [
         {
             "id": image.id,
             "filename": image.filename,
             "description": image.ImageDescription,
         }
-        for image in images
+        for image in paginated_images.items
     ]
 
-    # Shuffle the images to return them in random order
-    random.shuffle(image_info)
-
-    return jsonify(image_info)
+    return jsonify(
+        {
+            "images": image_info,
+            "total": paginated_images.total,
+            "pages": paginated_images.pages,
+            "current_page": paginated_images.page,
+        }
+    )
 
 
 def init(app: Flask):
