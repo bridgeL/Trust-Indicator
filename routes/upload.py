@@ -16,7 +16,7 @@ from werkzeug.utils import secure_filename
 
 from database import Image, db
 from routes.aigc_detector import detect_aigc
-from trust_indicator.ExifExtractor.InterfaceTester import extract_exif_data
+from ExifExtractor.InterfaceTester import extract_exif_data
 
 bp = Blueprint("upload", __name__)
 

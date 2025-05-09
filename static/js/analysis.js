@@ -1,6 +1,7 @@
 let hasShownCountdown = false;
 
 function checkCountdownStatus(imageId) {
+    document.querySelector(".warpper-wait").style.display = "";
     const storedImageId = sessionStorage.getItem("lastAnalyzedImage");
     if (storedImageId === imageId) {
         hasShownCountdown = true;
