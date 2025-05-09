@@ -15,6 +15,7 @@ from flask_login import current_user, login_required
 from werkzeug.utils import secure_filename
 
 from database import Image, db
+from routes.aigc_detector import detect_aigc
 from trust_indicator.ExifExtractor.InterfaceTester import extract_exif_data
 
 bp = Blueprint("upload", __name__)
@@ -53,9 +54,9 @@ def upload_file():
             original_filename = file.filename
             exif_data = extract_exif_data(image_data_io)
             if exif_data:
-                with open("exif_data.txt", "w") as file:
-                    for key, value in exif_data.items():
-                        file.write(f"{key}: {value}\n")
+                # with open("exif_data.txt", "w") as file:
+                #     for key, value in exif_data.items():
+                #         file.write(f"{key}: {value}\n")
                 colorSpace = exif_data.get("ColorSpace")
                 datetime_original = exif_data.get("DateTime")
                 make = exif_data.get("Make")
@@ -201,46 +202,7 @@ def upload_file():
                     ),
                     "Longitude": longitude if longitude is not None else "None",
                 }
-                upload_time = datetime.utcnow()
-                new_image = Image(
-                    filename=filename,
-                    data=file_data,
-                    # Set default visibility to private when the image is first uploaded
-                    visibility="private",
-                    user_email=current_user.Email,
-                    UploadDate=upload_time,  # Save the upload time
-                    ColorSpace=colorSpace if colorSpace else "None",
-                    Created=datetime_original if datetime_original else "None",
-                    Make=make if make else "None",
-                    Model=model if model else "None",
-                    FocalLength=focal_length_value,
-                    Aperture=aperture_length_value,
-                    Exposure=exposure_length_value,
-                    ISO=iso_length_value,
-                    Flash=flash_length_value,
-                    ImageWidth=image_width,
-                    ImageLength=image_length,
-                    Altitude=altitude,
-                    LatitudeRef=latitudeRef if latitudeRef else "None",
-                    Latitude=latitude,
-                    LongitudeRef=longitudeRef if longitudeRef else "None",
-                    Longitude=longitude,
-                    # Add other metadata fields as necessary
-                )
 
-                db.session.add(new_image)
-                db.session.commit()
-
-                return jsonify(
-                    {
-                        "message": "Image successfully uploaded",
-                        "filename": original_filename,
-                        "file_size": file_size,
-                        "file_type": file_type,
-                        "metadata": metadata,
-                        "id": new_image.id,
-                    }
-                )
             else:
                 metadata = {
                     "ColorSpace": "unidentifiable",
@@ -261,44 +223,49 @@ def upload_file():
                     "Longitude": "None",
                 }
 
-                upload_time = datetime.utcnow()
-                new_image = Image(
-                    filename=filename,
-                    data=file_data,
-                    visibility="private",
-                    user_email=current_user.Email,
-                    UploadDate=upload_time,  # Save the upload time
-                    ColorSpace=None,
-                    Created=None,
-                    Make=None,
-                    Model=None,
-                    FocalLength=None,
-                    Aperture=None,
-                    Exposure=None,
-                    ISO=None,
-                    Flash=None,
-                    ImageWidth=None,
-                    ImageLength=None,
-                    Altitude=None,
-                    LatitudeRef=None,
-                    Latitude=None,
-                    LongitudeRef=None,
-                    Longitude=None,
-                    # Add other metadata fields as necessary
-                )
+            # save the file to the database
+            upload_time = datetime.utcnow()
+            new_image = Image(
+                filename=filename,
+                data=file_data,
+                # Set default visibility to private when the image is first uploaded
+                visibility="private",
+                user_email=current_user.Email,
+                UploadDate=upload_time,  # Save the upload time
+                ColorSpace=colorSpace if colorSpace else "None",
+                Created=datetime_original if datetime_original else "None",
+                Make=make if make else "None",
+                Model=model if model else "None",
+                FocalLength=focal_length_value,
+                Aperture=aperture_length_value,
+                Exposure=exposure_length_value,
+                ISO=iso_length_value,
+                Flash=flash_length_value,
+                ImageWidth=image_width,
+                ImageLength=image_length,
+                Altitude=altitude,
+                LatitudeRef=latitudeRef if latitudeRef else "None",
+                Latitude=latitude,
+                LongitudeRef=longitudeRef if longitudeRef else "None",
+                Longitude=longitude,
+                # Add other metadata fields as necessary
+            )
 
-                db.session.add(new_image)
-                db.session.commit()
-                return jsonify(
-                    {
-                        "message": "Image successfully uploaded",
-                        "filename": original_filename,
-                        "file_size": file_size,
-                        "file_type": file_type,
-                        "metadata": metadata,
-                        "id": new_image.id,
-                    }
-                )
+            db.session.add(new_image)
+            db.session.commit()
+
+            detect_aigc(new_image.id)
+
+            return jsonify(
+                {
+                    "message": "Image successfully uploaded",
+                    "filename": original_filename,
+                    "file_size": file_size,
+                    "file_type": file_type,
+                    "metadata": metadata,
+                    "id": new_image.id,
+                }
+            )
 
         else:
             return jsonify(error="Allowed file types are: png, jpg, jpeg, gif"), 400

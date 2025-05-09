@@ -3,12 +3,16 @@
 import os
 import base64
 import json
+from re import A
 import uuid
 from io import BytesIO
+from flask import g
 import requests
 from typing import Dict, Any, Tuple, Optional
 import glob
 from PIL import Image
+
+from routes import aigc_detector
 
 # Import keys from config file
 ALIBABA_CLOUD_ACCESS_KEY_ID = os.environ.get("ALIBABA_CLOUD_ACCESS_KEY_ID")
@@ -370,6 +374,19 @@ class AigcDetector:
         """
         is_aigc, confidence, _ = self.detect_image_from_bytes(image_bytes)
         return is_aigc, confidence
+
+
+_aigc_detector: AigcDetector = None
+
+
+def get_aigc_detector() -> AigcDetector:
+    """
+    Get AIGC Detector instance
+    """
+    global _aigc_detector
+    if _aigc_detector is None:
+        _aigc_detector = AigcDetector()
+    return _aigc_detector
 
 
 # Test code

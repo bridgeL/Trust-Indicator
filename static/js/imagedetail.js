@@ -317,7 +317,7 @@ async function fetchTrustReport(imageId) {
         console.log("✅ AI Threshold used：", aiThreshold);
 
         // Step 3: 获取 AIGC confidence
-        const aigcRes = await fetch('/api/detect_aigc', {
+        const aigcRes = await fetch('/api/get_aigc', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

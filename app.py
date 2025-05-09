@@ -32,7 +32,7 @@ routes.feedback.init(app)
 routes.whatwedo.init(app)
 
 
-extension.print_all_endpoints(app)
+# extension.print_all_endpoints(app)
 
 
 if __name__ == "__main__":
