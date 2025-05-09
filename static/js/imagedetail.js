@@ -406,10 +406,10 @@ async function fetchTrustReport(imageId) {
         // Step 4: 生成判断文本
         const trustworthy = confidence * 100 < aiThreshold;
         const resultText = `
-            <strong>AI Threshold：</strong>${aiThreshold}%<br>
-            <strong>Confidence from AIGC detector：</strong>${confidence.toFixed(
+            <strong>AIGC Threshold：</strong>${aiThreshold}%<br>
+            <strong>AIGC Probability from AIGC detector：</strong>${confidence.toFixed(
                 1
-            )}<br>
+            )*100}%<br>
             ${
                 trustworthy
                     ? "✅ According to user's trust profile, this picture is trustworthy."

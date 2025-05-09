@@ -78,6 +78,7 @@ class Image(db.Model):
     __tablename__ = "images"
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(150))
+    thumb_data = db.Column(db.LargeBinary)  # 用于存储缩略图的二进制数据
     data = db.Column(db.LargeBinary)  # 用于存储图片的二进制数据
     user_email = db.Column(db.String(120), db.ForeignKey("user.Email"), nullable=False)
     ImageTitle = db.Column(db.Text)
@@ -112,10 +113,10 @@ def create_database(app: Flask):
 
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///MyDatabase.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    db.init_app(app)
 
     if not os.path.exists("instance/MyDatabase.db"):
         with app.app_context():
             db.create_all()
         print("Database created!")
 
-    db.init_app(app)

@@ -269,13 +269,14 @@ document.addEventListener("DOMContentLoaded", function () {
     function previewImage(file) {
         let reader = new FileReader();
         reader.onloadend = function () {
-            // 存储 base64 到 sessionStorage
-            sessionStorage.setItem("uploadedImageBase64", reader.result);
-
             // 显示图片
             dropBox.style.backgroundImage = "url(" + reader.result + ")";
             dropBox.innerHTML = "<p>Uploaded Successfully</p>";
+
+            // 存储 base64 到 sessionStorage
+            sessionStorage.setItem("uploadedImageBase64", reader.result);
         };
+        
         if (file) {
             reader.readAsDataURL(file);
         }

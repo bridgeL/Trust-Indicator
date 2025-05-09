@@ -22,8 +22,14 @@ def GotoGallery():
 def get_image(image_id):
     image = Image.query.get(image_id)
     if image and image.data:
+        thumb = request.args.get("thumb", "")
+        if thumb:
+            data = BytesIO(image.thumb_data)
+        else:
+            data = BytesIO(image.data)
+
         return send_file(
-            BytesIO(image.data),
+            data,
             mimetype="image/jpeg",  # or 'image/png' etc depending on your image type
             as_attachment=True,
             download_name=image.filename,

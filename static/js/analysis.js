@@ -80,15 +80,13 @@ async function detectAigc(imageId) {
         const data = await response.json();
         if (data.status !== "success") throw new Error(data.message);
 
-        const confidence = data.confidence;
-        const isAigc = data.is_aigc;
+        const confidence = Math.round(data.confidence * 100);
 
         return {
-            score_original: Math.round(isAigc ? 100 - confidence : confidence),
-            score_aigc: Math.round(isAigc ? confidence : 100 - confidence),
+            score_original: 100 - confidence,
+            score_aigc: confidence,
             score_manipulation: Math.round(Math.random() * 19 + 1),
-            isAigc,
-            confidence,
+            confidence: confidence
         };
     } catch (error) {
         console.error("AIGC detection error:", error);
@@ -100,32 +98,26 @@ function getRandomScores() {
     const selectedImageType = document.querySelector(
         'input[name="image-type"]:checked'
     );
-    let score_original, score_aigc;
+    let score_aigc;
 
     if (selectedImageType) {
-        score_original =
-            selectedImageType.value === "Original"
-                ? Math.random() * 20 + 70
-                : Math.random() * 20;
-        score_aigc = 100 - score_original;
+        score_aigc = selectedImageType.value === "Original" 
+            ? Math.random() * 20 
+            : Math.random() * 20 + 80;
     } else {
-        score_original = Math.random() * 10 + 70;
-        score_aigc = 100 - score_original;
+        score_aigc = Math.random() * 30;
     }
 
     return {
-        score_original: Math.round(score_original),
+        score_original: 100 - Math.round(score_aigc),
         score_aigc: Math.round(score_aigc),
         score_manipulation: Math.round(Math.random() * 19 + 1),
-        isAigc: score_aigc > 50,
-        confidence: score_aigc > 50 ? score_aigc : score_original,
+        confidence: Math.round(score_aigc)
     };
 }
 
-function computeTrustScore(isAigc, confidence) {
-    return Math.round(
-        Math.max(0, Math.min(100, isAigc ? 100 - confidence : confidence))
-    );
+function computeTrustScore(confidence) {
+    return Math.round(100 - confidence);
 }
 
 function updateChart(id, score) {
@@ -145,11 +137,9 @@ function updateSignalElements(scores) {
             : "none";
 
     signal2.style.backgroundImage =
-        scores.score_original > 50
-            ? "url('/static/images/origin.png')"
-            : scores.score_aigc > 50
+        scores.score_aigc > 50
             ? "url('/static/images/aigc.png')"
-            : "none";
+            : "url('/static/images/origin.png')";
 }
 
 document.addEventListener("DOMContentLoaded", async function () {
@@ -196,7 +186,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     updateSignalElements(scores);
 
     document.getElementById("trust-score").textContent = `${computeTrustScore(
-        scores.isAigc,
         scores.confidence
     )}%`;
 

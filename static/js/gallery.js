@@ -49,7 +49,7 @@ function updateGallery(data, append = false) {
 
         // 图片
         const img = document.createElement("img");
-        img.dataset.src = `/image/${image.id}`;
+        img.dataset.src = `/image/${image.id}?thumb=true`;
         img.alt = image.filename || "";
         img.style.width = "0";
         img.style.display = "";

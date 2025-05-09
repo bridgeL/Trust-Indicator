@@ -1,6 +1,7 @@
 import os
 from io import BytesIO
 from datetime import datetime
+from PIL import Image as PILImage
 
 from flask import (
     Blueprint,
@@ -24,6 +25,51 @@ bp = Blueprint("upload", __name__)
 @bp.route("/upload")
 def upload():
     return render_template("html/upload.html")
+
+
+def create_thumbnail(original_data, max_size_kb=100, min_quality=20):
+    img = PILImage.open(BytesIO(original_data))
+
+    # 转换为RGB模式（如果是RGBA或CMYK等）
+    if img.mode != "RGB":
+        img = img.convert("RGB")
+
+    # 初始参数
+    quality = 85  # 初始质量
+    width, height = img.size
+    ratio = 1.0  # 初始缩放比例
+
+    output = BytesIO()
+
+    # 循环调整直到大小<=max_size_kb
+    while True:
+        # 计算新尺寸
+        new_width = int(width * ratio)
+        new_height = int(height * ratio)
+
+        # 调整尺寸
+        resized_img = img.resize((new_width, new_height), PILImage.LANCZOS)
+
+        # 尝试保存
+        output.seek(0)
+        output.truncate()
+        resized_img.save(output, format="JPEG", quality=quality, optimize=True)
+
+        # 检查大小
+        if len(output.getvalue()) <= max_size_kb * 1024:
+            break
+
+        # 调整参数
+        if quality > min_quality:
+            quality -= 5  # 先降低质量
+        else:
+            ratio *= 0.9  # 再缩小尺寸
+
+        # 防止无限循环
+        if ratio < 0.1 or quality < min_quality:
+            break
+
+    return output.getvalue()
 
 
 @bp.route("/uploadImage", methods=["POST"])
@@ -53,7 +99,7 @@ def upload_file():
             file_type = file.content_type
             original_filename = file.filename
             exif_data = extract_exif_data(image_data_io)
-            
+
             if exif_data:
                 colorSpace = exif_data.get("ColorSpace")
                 datetime_original = exif_data.get("DateTime")
@@ -146,6 +192,7 @@ def upload_file():
             upload_time = datetime.utcnow()
             new_image = Image(
                 filename=filename,
+                thumb_data=create_thumbnail(file_data),
                 data=file_data,
                 # Set default visibility to private when the image is first uploaded
                 visibility="private",
