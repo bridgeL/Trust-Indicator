@@ -27,7 +27,12 @@ def detect_aigc(image_id):
     is_aigc, confidence, response = detector.detect_image_from_bytes(image_bytes)
 
     # 将检测结果存储到数据库
-    image.ai_prob = confidence / 100.0  # 转换为0-1范围的概率值
+    if is_aigc:
+        image.ai_prob = confidence / 100.0  # 转换为0-1范围的概率值
+    else:
+        image.ai_prob = 1 - confidence / 100.0
+
+    print(is_aigc, confidence, response)
     db.session.commit()
 
     return True
