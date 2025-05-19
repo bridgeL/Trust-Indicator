@@ -345,3 +345,80 @@ window.addEventListener('resize', function() {
     gallery.style.transform = `translateX(-${currentSlide * divWidth}px)`;
 });
 
+function showBetaDisclaimer() {
+    // Get stored status and timestamp
+    const disclaimerShown = localStorage.getItem('betaDisclaimerShown');
+    const lastShownTime = localStorage.getItem('betaDisclaimerTime');
+    
+    // Check if popup has been shown before and if it's within 5 minutes
+    const currentTime = new Date().getTime();
+    const fiveMinutes = 5 * 60 * 1000; // 5 minutes in milliseconds
+    
+    if (!disclaimerShown || !lastShownTime || (currentTime - parseInt(lastShownTime)) > fiveMinutes) {
+        // Create overlay element
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+        overlay.style.display = 'flex';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.style.zIndex = '1000';
+        
+        // Create modal content
+        const modal = document.createElement('div');
+        modal.style.backgroundColor = 'white';
+        modal.style.padding = '25px';
+        modal.style.borderRadius = '8px';
+        modal.style.maxWidth = '500px';
+        modal.style.margin = '0 15px';
+        modal.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+        
+        // Modal title
+        const title = document.createElement('h2');
+        title.textContent = 'Disclaimer: Beta Version Notice';
+        title.style.marginTop = '0';
+        title.style.color = '#333';
+        
+        // Modal content
+        const content = document.createElement('div');
+        content.innerHTML = `
+            <p>Please note that our website is currently in its beta phase. As such, some features and functionalities presented in our promotional materials, including our pitch video, may not yet be fully implemented or operational.</p>
+            <p>We are actively working to develop and enhance the platform, and we appreciate your understanding and patience during this period.</p>
+            <p>For a preview of our vision and planned features, you can view our pitch video here: <a href="https://youtu.be/4iku4OLeG5M" target="_blank" style="color: #007bff; text-decoration: none;">https://youtu.be/4iku4OLeG5M</a>.</p>
+        `;
+        
+        // Close button
+        const closeButton = document.createElement('button');
+        closeButton.textContent = 'I Understand';
+        closeButton.style.marginTop = '15px';
+        closeButton.style.padding = '8px 16px';
+        closeButton.style.backgroundColor = '#007bff';
+        closeButton.style.color = 'white';
+        closeButton.style.border = 'none';
+        closeButton.style.borderRadius = '4px';
+        closeButton.style.cursor = 'pointer';
+        closeButton.style.fontSize = '16px';
+        
+        // Assemble modal
+        modal.appendChild(title);
+        modal.appendChild(content);
+        modal.appendChild(closeButton);
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+        
+        // Close button event
+        closeButton.addEventListener('click', () => {
+            document.body.removeChild(overlay);
+            // Set localStorage flag and timestamp
+            localStorage.setItem('betaDisclaimerShown', 'true');
+            localStorage.setItem('betaDisclaimerTime', currentTime.toString());
+        });
+    }
+}
+
+// Call when page finishes loading
+window.addEventListener('DOMContentLoaded', showBetaDisclaimer);
