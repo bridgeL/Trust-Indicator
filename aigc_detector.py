@@ -8,6 +8,7 @@ import requests
 from typing import Dict, Any, Tuple
 import glob
 from PIL import Image
+from logger import print
 
 # Import keys from config file
 ALIBABA_CLOUD_ACCESS_KEY_ID = os.environ.get("ALIBABA_CLOUD_ACCESS_KEY_ID")

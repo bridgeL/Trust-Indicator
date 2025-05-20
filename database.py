@@ -2,6 +2,7 @@ import os
 from flask import Flask
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
+from logger import print
 
 
 db = SQLAlchemy()

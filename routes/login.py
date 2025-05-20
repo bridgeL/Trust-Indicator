@@ -10,6 +10,7 @@ from sqlalchemy.exc import IntegrityError
 
 from database import User, db
 from mail import send_email
+from logger import print
 
 bp = Blueprint("auth", __name__)
 

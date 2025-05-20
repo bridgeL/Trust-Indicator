@@ -22,3 +22,9 @@ def setup_logger():
     werkzeug_logger = logging.getLogger("werkzeug")
     werkzeug_logger.addHandler(file_handler)
     werkzeug_logger.addHandler(console_handler)
+
+
+def print(*args):
+    s = " ".join(str(a) for a in args)
+    werkzeug_logger = logging.getLogger("werkzeug")
+    werkzeug_logger.info(s)

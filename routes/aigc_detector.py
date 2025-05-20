@@ -3,6 +3,7 @@ from flask_login import login_required
 
 from database import Image, db
 from aigc_detector import get_aigc_detector
+from logger import print
 
 bp = Blueprint("aigc_detector", __name__)
 

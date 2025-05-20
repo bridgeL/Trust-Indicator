@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_mail import Mail, Message
+from logger import print
 
 mail = Mail()
 
@@ -23,6 +24,7 @@ def init(app: Flask):
 
 def send_email(subject, recipient, body, html):
     msg = Message(subject=subject, sender=mail_username, recipients=[recipient])
+    print(msg)
     msg.body = body
     msg.html = html
     mail.send(msg)

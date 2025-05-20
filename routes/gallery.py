@@ -6,6 +6,7 @@ from flask import Blueprint, Flask, render_template, send_file, jsonify, request
 from flask_login import current_user
 
 from database import Image
+from logger import print
 
 bp = Blueprint("gallery", __name__)
 

@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from database import create_database
 from logger import setup_logger
 
-load_dotenv()
+load_dotenv(verbose=True, override=True)
 
 app = Flask(__name__)
 create_database(app)
