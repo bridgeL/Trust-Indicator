@@ -17,5 +17,5 @@ https://sites.google.com/view/trustindicators
 
 We would like to extend our sincere gratitude to the previous team for their valuable contributions to the project. Their hard work and dedication have laid a solid foundation for us to build upon.
 
-For detailed information about the previous team's work, please refer to the materials provided at https://github.com/Trust-Indicator/Trust-Indicator
+For detailed information about the previous team's work, please refer to the materials provided at [here](./docs/total-project.md)
 
