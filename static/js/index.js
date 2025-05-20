@@ -379,16 +379,16 @@ function showBetaDisclaimer() {
         
         // Modal title
         const title = document.createElement('h2');
-        title.textContent = 'Disclaimer: Beta Version Notice';
+        title.textContent = 'Beta Version Notice';
         title.style.marginTop = '0';
         title.style.color = '#333';
         
         // Modal content
         const content = document.createElement('div');
         content.innerHTML = `
-            <p>Please note that our website is currently in its beta phase. As such, some features and functionalities presented in our promotional materials, including our pitch video, may not yet be fully implemented or operational.</p>
+            <p>This website is a TechLauncher research project being developed at the Australian National University. Please note that this website is currently in its beta phase.  Some features and functionalities may not yet be fully implemented or operational.</p>
             <p>We are actively working to develop and enhance the platform, and we appreciate your understanding and patience during this period.</p>
-            <p>For a preview of our vision and planned features, you can view our pitch video here: <a href="https://youtu.be/4iku4OLeG5M" target="_blank" style="color: #007bff; text-decoration: none;">https://youtu.be/4iku4OLeG5M</a>.</p>
+            <p>For a preview of our vision and planned features, please visit: <a href="https://youtu.be/4iku4OLeG5M" target="_blank" style="color: #007bff; text-decoration: none;">https://youtu.be/4iku4OLeG5M</a>.</p>
         `;
         
         // Close button
