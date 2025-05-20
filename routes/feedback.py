@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import Blueprint, Flask, render_template, jsonify, request
 from database import Feedback, db
-from extension import send_email
+from mail import send_email
 
 bp = Blueprint("feedback", __name__)
 

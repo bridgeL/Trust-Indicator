@@ -11,6 +11,9 @@ exif_data.txt
 __pycache__
 .DS_Store
 
+# log
+/log
+
 # venv
 .venv
 

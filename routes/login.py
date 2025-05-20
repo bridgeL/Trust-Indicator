@@ -4,14 +4,21 @@ import random
 from datetime import datetime, timedelta
 
 from flask import Blueprint, Flask, render_template, jsonify, url_for, session, request
-from flask_login import logout_user, login_user
+from flask_login import logout_user, login_user, LoginManager
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.exc import IntegrityError
 
 from database import User, db
-from extension import send_email
+from mail import send_email
 
 bp = Blueprint("auth", __name__)
+
+login_manager = LoginManager()
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 @bp.route("/signup")
@@ -228,4 +235,5 @@ def login_function():
 
 
 def init(app: Flask):
+    login_manager.init_app(app)
     app.register_blueprint(bp)

@@ -3,16 +3,11 @@
 import os
 import base64
 import json
-from re import A
 import uuid
-from io import BytesIO
-from flask import g
 import requests
-from typing import Dict, Any, Tuple, Optional
+from typing import Dict, Any, Tuple
 import glob
 from PIL import Image
-
-from routes import aigc_detector
 
 # Import keys from config file
 ALIBABA_CLOUD_ACCESS_KEY_ID = os.environ.get("ALIBABA_CLOUD_ACCESS_KEY_ID")
