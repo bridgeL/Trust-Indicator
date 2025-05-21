@@ -23,7 +23,7 @@ our website should be accessable on [picture.au](picture.au)
 
 our vps is provided by [bandwagonhost.com](https://bandwagonhost.com)
 
-more details on [here](./deploy.md)
+more details on [doc](./deploy.md)
 
 ## How to setup Gmail smtp
 
@@ -33,7 +33,7 @@ Here is how to setup smtp server: [video](https://www.youtube.com/watch?v=ZfEK3W
 
 ## How to setup Alibaba Cloud AIGC API
 
-[here](./AIGC_DETECTOR_README.md)
+[doc](./AIGC_DETECTOR_README.md)
 
 ## How to check backend structure
 
