@@ -17,6 +17,6 @@ For detailed information about the previous team's work, please refer to the mat
 
 ## Website
 
-[picture.au](picture.au)
+[picture.au](https://picture.au)
 
 ![alt text](docs/image.png)
