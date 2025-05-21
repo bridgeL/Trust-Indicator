@@ -90,27 +90,6 @@ Thank you for your guidance throughout this project.
 
 All sensitive credentials listed below have been communicated for secure transfer, as detailed in the email dated May 21, 2025. **Note:** API keys and sensitive credentials in the `.env` file must be handled securely and should *not* be committed to version control repositories[cite: 163].
 
-* **[Icon: GitHub] Code Repositories:**
-    * Main Repository: `https://github.com/bridgeL/Trust-indicator` [cite: 155]
-    * (Ensure client Sabrina Caldwell has access to all repositories as per checklist from email).
-* **[Icon: Email] Gmail SMTP (Email Service):** (Details from email)
-    * Address: `trustindicator9@gmail.com`
-    * Password: `team-ti2025!`
-* **[Icon: Server] VPS Management (BandwagonHost):** (Details from email)
-    * Account: `sabrina.caldwell@anu.edu.au`
-    * Password: `TL!!team2025`
-* **[Icon: Terminal] Server Access:** (Details from email)
-    * SSH Port: `28264`
-    * IP Address: `144.34.161.14`
-    * Usernames/Passwords:
-        * `root`: `<Resettable on BandwagonHost>`
-        * `user-ti`: `team-ti2025!`
-* **[Icon: File] Environment Variables (`.env` file):** (Details from email and [cite: 164])
-    * An `.env` file containing the following has been provided:
-        * Alibaba Cloud API Keys (`ALIBABA_CLOUD_ACCESS_KEY_ID`, `ALIBABA_CLOUD_ACCESS_KEY_SECRET`) [cite: 164]
-        * ImgBB API Key (`IMGBB_API_KEY`) [cite: 164]
-        * Gmail SMTP API Keys/Credentials (`MAIL_USERNAME`, `MAIL_PASSWORD`) [cite: 164]
-
 ---
 
 ## 5. Setup & Usage
