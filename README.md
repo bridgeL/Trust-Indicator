@@ -20,3 +20,10 @@ For detailed information about the previous team's work, please refer to the mat
 [picture.au](https://picture.au)
 
 ![alt text](docs/image.png)
+
+## Structure
+
+![img](docs/0.png)
+![img](docs/1.png)
+![img](docs/2.png)
+![img](docs/3.png)
